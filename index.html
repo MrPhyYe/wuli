@@ -118,6 +118,13 @@
         #overlay .page-indicator { color: rgba(255,255,255,0.7); font-size: 15px; }
         #overlay .close-btn { position: fixed; top: 20px; right: 30px; color: white; font-size: 36px; cursor: pointer; opacity: 0.7; z-index: 10000; line-height: 1; }
         #overlay .close-btn:hover { opacity: 1; }
+        #overlay canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: auto; cursor: crosshair; }
+        #overlay .draw-toolbar { position: fixed; top: 20px; left: 20px; z-index: 10002; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+        #overlay .draw-toolbar .dt-btn { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 14px; transition: background 0.2s; white-space: nowrap; }
+        #overlay .draw-toolbar .dt-btn:hover { background: rgba(255,255,255,0.3); }
+        #overlay .draw-toolbar .dt-btn.active { background: rgba(255,215,0,0.6); border-color: #FFD700; }
+        #overlay .draw-toolbar input[type=color] { width: 36px; height: 36px; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; cursor: pointer; background: transparent; padding: 2px; }
+        #overlay .draw-toolbar input[type=range] { width: 80px; accent-color: #FFD700; }
         .missing { color: #e57373; font-style: italic; }
         .placeholder { color: #999; font-style: italic; text-align: center; padding: 60px 20px; }
         footer { text-align: center; padding: 30px; color: #666; font-size: 0.9em; }
@@ -192,7 +199,16 @@ function toggleMusic() {
         </div>
     </header>
     <div id="overlay" onclick="if(event.target===this)closeZoom()">
+        <canvas id="drawCanvas"></canvas>
         <span class="close-btn" onclick="closeZoom()">&times;</span>
+        <div class="draw-toolbar" id="drawToolbar" style="display:none;">
+            <button class="dt-btn" id="dtPen" onclick="setTool('pen')">✏️ 画笔</button>
+            <button class="dt-btn" id="dtHighlighter" onclick="setTool('highlighter')">🖍️ 荧光笔</button>
+            <button class="dt-btn" id="dtEraser" onclick="setTool('eraser')">🧹 橡皮</button>
+            <input type="color" id="dtColor" value="#FF0000" onchange="updateColor()" title="颜色">
+            <input type="range" id="dtSize" min="1" max="20" value="3" oninput="updateSize()" title="粗细">
+            <button class="dt-btn" onclick="clearCanvas()">🗑️ 清除</button>
+        </div>
         <div class="img-wrapper">
             <div class="zoom-bar">
                 <button class="zoom-btn" onclick="zoomOut()">−</button>
@@ -267,18 +283,120 @@ function toggleMusic() {
     let currentIndex = 0;
     let currentZoom = 1.0;
 
+    // ===== 绘制功能（全屏canvas）=====
+    const canvas = document.getElementById('drawCanvas');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+    let drawTool = 'pen';        // pen | highlighter | eraser
+    let drawColor = '#FF0000';
+    let drawSize = 3;
+
+    function resizeCanvas() {
+        const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        ctx.putImageData(data, 0, 0);
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    function setTool(tool) {
+        drawTool = tool;
+        document.getElementById('dtPen').classList.toggle('active', tool === 'pen');
+        document.getElementById('dtHighlighter').classList.toggle('active', tool === 'highlighter');
+        document.getElementById('dtEraser').classList.toggle('active', tool === 'eraser');
+    }
+
+    function updateColor() {
+        drawColor = document.getElementById('dtColor').value;
+    }
+
+    function updateSize() {
+        drawSize = parseInt(document.getElementById('dtSize').value);
+    }
+
+    function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    canvas.addEventListener('mousedown', function(e) {
+        drawing = true;
+        ctx.beginPath();
+        ctx.moveTo(e.clientX, e.clientY);
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        if (drawTool === 'eraser') {
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.lineWidth = drawSize * 3;
+        } else if (drawTool === 'highlighter') {
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.strokeStyle = drawColor + '60';
+            ctx.lineWidth = drawSize * 4;
+        } else {
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.strokeStyle = drawColor;
+            ctx.lineWidth = drawSize;
+        }
+    });
+
+    canvas.addEventListener('mousemove', function(e) {
+        if (!drawing) return;
+        ctx.lineTo(e.clientX, e.clientY);
+        ctx.stroke();
+    });
+
+    canvas.addEventListener('mouseup', function() { drawing = false; });
+    canvas.addEventListener('mouseleave', function() { drawing = false; });
+
+    // 触摸支持
+    canvas.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        drawing = true;
+        const t = e.touches[0];
+        ctx.beginPath();
+        ctx.moveTo(t.clientX, t.clientY);
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        if (drawTool === 'eraser') {
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.lineWidth = drawSize * 3;
+        } else if (drawTool === 'highlighter') {
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.strokeStyle = drawColor + '60';
+            ctx.lineWidth = drawSize * 4;
+        } else {
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.strokeStyle = drawColor;
+            ctx.lineWidth = drawSize;
+        }
+    });
+
+    canvas.addEventListener('touchmove', function(e) {
+        e.preventDefault();
+        if (!drawing) return;
+        const t = e.touches[0];
+        ctx.lineTo(t.clientX, t.clientY);
+        ctx.stroke();
+    });
+
+    canvas.addEventListener('touchend', function() { drawing = false; });
+
     function openGallery(index) {
         currentIndex = index;
         currentZoom = 1.0;
-        showImage(index);
         document.getElementById('overlay').classList.add('show');
+        document.getElementById('drawToolbar').style.display = 'flex';
         document.body.style.overflow = 'hidden';
+        showImage(index);
     }
 
     function showImage(index) {
         const img = document.getElementById('zoomed-img');
+        img.style.transform = 'scale(1)';
+        img.onload = function() {
+            img.style.transform = 'scale(' + currentZoom + ')';
+        };
         img.src = answerImages[index];
-        img.style.transform = 'scale(' + currentZoom + ')';
         document.getElementById('zoomLevel').textContent = Math.round(currentZoom * 100) + '%';
         const total = answerImages.length;
         document.getElementById('pageIndicator').textContent = (index + 1) + ' / ' + total;
@@ -320,7 +438,9 @@ function toggleMusic() {
 
     function closeZoom() {
         document.getElementById('overlay').classList.remove('show');
+        document.getElementById('drawToolbar').style.display = 'none';
         document.body.style.overflow = '';
+        clearCanvas();
     }
 
     document.addEventListener('keydown', function(e) {
@@ -329,8 +449,12 @@ function toggleMusic() {
         if (e.key === 'Escape') closeZoom();
         if (e.key === 'ArrowRight') nextImg();
         if (e.key === 'ArrowLeft') prevImg();
-        if (e.key === '+' || e.key === '=') zoomIn();
-        if (e.key === '-') zoomOut();
+        if (e.key === '+' || e.key === '=') { zoomIn(); e.preventDefault(); }
+        if (e.key === '-') { zoomOut(); e.preventDefault(); }
+        if (e.key === 'd' || e.key === 'D') {
+            const tb = document.getElementById('drawToolbar');
+            tb.style.display = tb.style.display === 'none' ? 'flex' : 'none';
+        }
     });
     </script>
 </body>
