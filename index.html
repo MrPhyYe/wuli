@@ -105,8 +105,26 @@
         .zoom-img:hover { transform: scale(1.02); box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
         #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 9999; justify-content: center; align-items: center; }
         #overlay.show { display: flex; }
-        #overlay .img-wrapper { position: relative; max-width: 98vw; max-height: 98vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        #overlay img { max-width: 98vw; max-height: 85vh; object-fit: contain; border-radius: 4px; cursor: default; transition: transform 0.2s; }
+        #overlay .img-wrapper { position: relative; width: 96vw; height: 82vh; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; margin-top: 60px; border: 2px solid rgba(255,255,255,0.3); border-radius: 8px; background: rgba(0,0,0,0.2); }
+        #overlay .img-viewport { width: 100%; height: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; }
+        #overlay .img-viewport:active { cursor: default; }
+        #overlay img { max-width: none; max-height: none; object-fit: contain; border-radius: 4px; cursor: inherit; transition: transform 0.1s; position: absolute; user-select: none; pointer-events: none; z-index: 1; }
+        /* 滚动条样式 - 带箭头细长型 */
+        #overlay .scrollbar-v { position: absolute; right: 6px; top: 6px; bottom: 6px; width: 16px; background: rgba(240,240,240,0.9); border: 1px solid #aaa; border-radius: 3px; display: none; z-index: 50; user-select: none; }
+        #overlay .scrollbar-h { position: absolute; bottom: 6px; left: 6px; right: 6px; height: 16px; background: rgba(240,240,240,0.9); border: 1px solid #aaa; border-radius: 3px; display: none; z-index: 50; user-select: none; }
+        #overlay .scroll-arrow { position: absolute; width: 100%; height: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #555; font-size: 10px; background: rgba(220,220,220,0.9); }
+        #overlay .scroll-arrow:hover { background: rgba(200,200,200,0.95); color: #000; }
+        #overlay .scrollbar-v .scroll-arrow-up { top: 0; border-bottom: 1px solid #aaa; border-radius: 3px 3px 0 0; }
+        #overlay .scrollbar-v .scroll-arrow-down { bottom: 0; border-top: 1px solid #aaa; border-radius: 0 0 3px 3px; }
+        #overlay .scrollbar-h .scroll-arrow-left { left: 0; top: 0; height: 100%; width: 16px; border-right: 1px solid #aaa; border-radius: 3px 0 0 3px; }
+        #overlay .scrollbar-h .scroll-arrow-right { right: 0; top: 0; height: 100%; width: 16px; border-left: 1px solid #aaa; border-radius: 0 3px 3px 0; }
+        #overlay .scroll-track { position: absolute; background: rgba(240,240,240,0.9); }
+        #overlay .scrollbar-v .scroll-track { top: 17px; bottom: 17px; left: 0; right: 0; }
+        #overlay .scrollbar-h .scroll-track { left: 17px; right: 17px; top: 0; bottom: 0; }
+        #overlay .scrollbar-thumb { position: absolute; background: #888; border-radius: 3px; cursor: pointer; }
+        #overlay .scrollbar-v .scrollbar-thumb { width: 100%; left: 0; }
+        #overlay .scrollbar-h .scrollbar-thumb { height: 100%; top: 0; }
+        #overlay .scrollbar-thumb:hover { background: #555; }
         #overlay .zoom-bar { position: fixed; top: 70px; right: 76px; z-index: 10001; display: flex; align-items: center; gap: 15px; }
         #overlay .zoom-btn { background: rgba(255,255,255,0.2); color: white; border: none; font-size: 24px; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; transition: background 0.2s; }
         #overlay .zoom-btn:hover { background: rgba(255,255,255,0.4); }
@@ -118,7 +136,7 @@
         #overlay .page-indicator { color: rgba(255,255,255,0.7); font-size: 15px; }
         #overlay .close-btn { position: fixed; top: 20px; right: 30px; color: white; font-size: 36px; cursor: pointer; opacity: 0.7; z-index: 10000; line-height: 1; }
         #overlay .close-btn:hover { opacity: 1; }
-        #overlay canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: auto; cursor: crosshair; }
+        #overlay canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 15; pointer-events: none; user-select: none; }
         #overlay .draw-toolbar { position: fixed; top: 20px; left: 20px; z-index: 10002; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
         #overlay .draw-toolbar .dt-btn { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 14px; transition: background 0.2s; white-space: nowrap; }
         #overlay .draw-toolbar .dt-btn:hover { background: rgba(255,255,255,0.3); }
@@ -267,7 +285,21 @@ function prevSong() {
                 <span class="zoom-level" id="zoomLevel">100%</span>
                 <button class="zoom-btn" onclick="zoomIn()">+</button>
             </div>
-            <img id="zoomed-img" src="" alt="">
+            <div class="img-viewport" id="imgViewport">
+                <img id="zoomed-img" src="" alt="">
+                <!-- 垂直滚动条 -->
+                <div class="scrollbar-v" id="scrollbarV">
+                    <div class="scroll-arrow scroll-arrow-up" id="scrollUp">▲</div>
+                    <div class="scroll-track"><div class="scrollbar-thumb" id="scrollThumbV"></div></div>
+                    <div class="scroll-arrow scroll-arrow-down" id="scrollDown">▼</div>
+                </div>
+                <!-- 水平滚动条 -->
+                <div class="scrollbar-h" id="scrollbarH">
+                    <div class="scroll-arrow scroll-arrow-left" id="scrollLeft">◀</div>
+                    <div class="scroll-track"><div class="scrollbar-thumb" id="scrollThumbH"></div></div>
+                    <div class="scroll-arrow scroll-arrow-right" id="scrollRight">▶</div>
+                </div>
+            </div>
             <div class="nav-bar">
                 <button class="nav-btn" id="prevBtn" onclick="prevImg()">&#9664; 上一页</button>
                 <span class="page-indicator" id="pageIndicator">1 / 1</span>
@@ -351,6 +383,13 @@ function prevSong() {
     const answerImages = ['答案/答案1.jpg', '答案/答案2.jpg', '答案/答案3.jpg', '答案/答案5.jpg', '答案/答案6.jpg', '答案/答案7.jpg', '答案/答案9.jpg', '答案/答案10.jpg', '答案/答案11.jpg', '答案/答案13.jpg', '答案/答案14.jpg', '答案/答案15.jpg'];
     let currentIndex = 0;
     let currentZoom = 2.0;
+    let imgOffsetX = 0;
+    let imgOffsetY = 0;
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let dragStartOffsetX = 0;
+    let dragStartOffsetY = 0;
 
     // ===== 绘制功能（全屏canvas）=====
     const canvas = document.getElementById('drawCanvas');
@@ -369,11 +408,28 @@ function prevSong() {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
+    // 禁止右键菜单
+    canvas.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+    });
+
     function setTool(tool) {
-        drawTool = tool;
-        document.getElementById('dtPen').classList.toggle('active', tool === 'pen');
-        document.getElementById('dtHighlighter').classList.toggle('active', tool === 'highlighter');
-        document.getElementById('dtEraser').classList.toggle('active', tool === 'eraser');
+        // 再次点击同一工具则取消
+        if (drawTool === tool) {
+            drawTool = '';
+            document.getElementById('dtPen').classList.remove('active');
+            document.getElementById('dtHighlighter').classList.remove('active');
+            document.getElementById('dtEraser').classList.remove('active');
+            canvas.style.pointerEvents = 'none';
+        } else {
+            drawTool = tool;
+            document.getElementById('dtPen').classList.toggle('active', tool === 'pen');
+            document.getElementById('dtHighlighter').classList.toggle('active', tool === 'highlighter');
+            document.getElementById('dtEraser').classList.toggle('active', tool === 'eraser');
+            // 画笔模式下允许canvas接收事件
+            canvas.style.cursor = 'crosshair';
+            canvas.style.pointerEvents = 'auto';
+        }
     }
 
     function updateColor() {
@@ -390,6 +446,8 @@ function prevSong() {
 
     canvas.addEventListener('mousedown', function(e) {
         drawing = true;
+        // 画笔模式下改变视口光标
+        document.getElementById('imgViewport').style.cursor = 'default';
         ctx.beginPath();
         ctx.moveTo(e.clientX, e.clientY);
         ctx.lineCap = 'round';
@@ -409,18 +467,34 @@ function prevSong() {
     });
 
     canvas.addEventListener('mousemove', function(e) {
+        // 绘制时保持默认光标
+        if (drawing) {
+            canvas.style.cursor = 'default';
+        }
         if (!drawing) return;
         ctx.lineTo(e.clientX, e.clientY);
         ctx.stroke();
     });
 
-    canvas.addEventListener('mouseup', function() { drawing = false; });
-    canvas.addEventListener('mouseleave', function() { drawing = false; });
+    // 鼠标进入 canvas 时检查光标
+    canvas.addEventListener('mouseenter', function() {
+        if (drawing) {
+            canvas.style.cursor = 'default';
+        }
+    });
+
+    canvas.addEventListener('mouseup', function() {
+        drawing = false;
+    });
+    canvas.addEventListener('mouseleave', function() {
+        drawing = false;
+    });
 
     // 触摸支持
     canvas.addEventListener('touchstart', function(e) {
         e.preventDefault();
         drawing = true;
+        document.getElementById('imgViewport').style.cursor = 'default';
         const t = e.touches[0];
         ctx.beginPath();
         ctx.moveTo(t.clientX, t.clientY);
@@ -448,7 +522,9 @@ function prevSong() {
         ctx.stroke();
     });
 
-    canvas.addEventListener('touchend', function() { drawing = false; });
+    canvas.addEventListener('touchend', function() {
+        drawing = false;
+    });
 
     function openGallery(index) {
         currentIndex = index;
@@ -459,11 +535,55 @@ function prevSong() {
         showImage(index);
     }
 
+    function updateImageTransform() {
+        const img = document.getElementById('zoomed-img');
+        img.style.transform = 'scale(' + currentZoom + ') translate(' + imgOffsetX + 'px, ' + imgOffsetY + 'px)';
+    }
+
+    function constrainOffset() {
+        const img = document.getElementById('zoomed-img');
+        const viewport = document.getElementById('imgViewport');
+        if (!img || !viewport) return;
+        
+        const rect = img.getBoundingClientRect();
+        const vpRect = viewport.getBoundingClientRect();
+        
+        // 计算图片实际显示尺寸
+        const scaledWidth = rect.width;
+        const scaledHeight = rect.height;
+        
+        // 如果图片小于视口，居中显示
+        if (scaledWidth <= vpRect.width) {
+            imgOffsetX = 0;
+        } else {
+            // 限制偏移范围，确保边缘不会进入视口内太多
+            const maxOffset = (scaledWidth - vpRect.width) / (2 * currentZoom);
+            imgOffsetX = Math.max(-maxOffset, Math.min(maxOffset, imgOffsetX));
+        }
+        
+        if (scaledHeight <= vpRect.height) {
+            imgOffsetY = 0;
+        } else {
+            const maxOffset = (scaledHeight - vpRect.height) / (2 * currentZoom);
+            imgOffsetY = Math.max(-maxOffset, Math.min(maxOffset, imgOffsetY));
+        }
+    }
+
     function showImage(index) {
         const img = document.getElementById('zoomed-img');
-        img.style.transform = 'scale(1)';
+        const viewport = document.getElementById('imgViewport');
+        const scrollbarV = document.getElementById('scrollbarV');
+        const scrollbarH = document.getElementById('scrollbarH');
+        currentZoom = 2.0;
+        imgOffsetX = 0;
+        imgOffsetY = 0;
         img.onload = function() {
-            img.style.transform = 'scale(' + currentZoom + ')';
+            imgNaturalWidth = img.naturalWidth;
+            imgNaturalHeight = img.naturalHeight;
+            imgViewportW = viewport.clientWidth;
+            imgViewportH = viewport.clientHeight;
+            updateScrollbar();
+            updateImageTransform();
         };
         img.src = answerImages[index];
         document.getElementById('zoomLevel').textContent = Math.round(currentZoom * 100) + '%';
@@ -471,12 +591,55 @@ function prevSong() {
         document.getElementById('pageIndicator').textContent = (index + 1) + ' / ' + total;
         document.getElementById('prevBtn').disabled = (index === 0);
         document.getElementById('nextBtn').disabled = (index === total - 1);
+        updateImageTransform();
+    }
+
+    function updateScrollbar() {
+        const scrollbarV = document.getElementById('scrollbarV');
+        const scrollbarH = document.getElementById('scrollbarH');
+        const thumbV = document.getElementById('scrollThumbV');
+        const thumbH = document.getElementById('scrollThumbH');
+        
+        const scaledW = imgNaturalWidth * currentZoom;
+        const scaledH = imgNaturalHeight * currentZoom;
+        const showV = scaledH > imgViewportH;
+        const showH = scaledW > imgViewportW;
+        
+        scrollbarV.style.display = showV ? 'block' : 'none';
+        scrollbarH.style.display = showH ? 'block' : 'none';
+        
+        // 计算thumb大小
+        if (showV) {
+            const trackH = scrollbarV.querySelector('.scroll-track').clientHeight;
+            const thumbH_px = Math.max(20, trackH * (imgViewportH / scaledH));
+            thumbV.style.height = thumbH_px + 'px';
+            // 设置thumb位置
+            const maxOffsetY = (scaledH - imgViewportH) / 2 / currentZoom;
+            if (maxOffsetY > 0) {
+                const pos = (imgOffsetY + maxOffsetY) / (2 * maxOffsetY);
+                const trackTop = scrollbarV.querySelector('.scroll-track').offsetTop;
+                thumbV.style.top = (trackTop + pos * (trackH - thumbH_px)) + 'px';
+            }
+        }
+        if (showH) {
+            const trackW = scrollbarH.querySelector('.scroll-track').clientWidth;
+            const thumbW_px = Math.max(20, trackW * (imgViewportW / scaledW));
+            thumbH.style.width = thumbW_px + 'px';
+            const maxOffsetX = (scaledW - imgViewportW) / 2 / currentZoom;
+            if (maxOffsetX > 0) {
+                const pos = (imgOffsetX + maxOffsetX) / (2 * maxOffsetX);
+                const trackLeft = scrollbarH.querySelector('.scroll-track').offsetLeft;
+                thumbH.style.left = (trackLeft + pos * (trackW - thumbW_px)) + 'px';
+            }
+        }
     }
 
     function zoomIn() {
         if (currentZoom < 5) {
             currentZoom += 0.25;
-            document.getElementById('zoomed-img').style.transform = 'scale(' + currentZoom + ')';
+            constrainOffset();
+            updateImageTransform();
+            updateScrollbar();
             document.getElementById('zoomLevel').textContent = Math.round(currentZoom * 100) + '%';
         }
     }
@@ -484,7 +647,13 @@ function prevSong() {
     function zoomOut() {
         if (currentZoom > 1.0) {
             currentZoom -= 0.25;
-            document.getElementById('zoomed-img').style.transform = 'scale(' + currentZoom + ')';
+            if (currentZoom <= 1.0) {
+                imgOffsetX = 0;
+                imgOffsetY = 0;
+            }
+            constrainOffset();
+            updateImageTransform();
+            updateScrollbar();
             document.getElementById('zoomLevel').textContent = Math.round(currentZoom * 100) + '%';
         }
     }
@@ -505,12 +674,183 @@ function prevSong() {
         }
     }
 
+    // 拖拽功能已移除，改用滑动条
+    function initDrag() {}
+
     function closeZoom() {
         document.getElementById('overlay').classList.remove('show');
         document.getElementById('drawToolbar').style.display = 'none';
         document.body.style.overflow = '';
         clearCanvas();
+        imgOffsetX = 0;
+        imgOffsetY = 0;
+        currentZoom = 2.0;
+        canvas.style.pointerEvents = 'none';
     }
+
+    // 滚动条拖动功能
+    let isScrollbarDragging = false;
+    function initScrollbar() {
+        const scrollbarV = document.getElementById('scrollbarV');
+        const scrollbarH = document.getElementById('scrollbarH');
+        const thumbV = document.getElementById('scrollThumbV');
+        const thumbH = document.getElementById('scrollThumbH');
+        const scrollUp = document.getElementById('scrollUp');
+        const scrollDown = document.getElementById('scrollDown');
+        const scrollLeft = document.getElementById('scrollLeft');
+        const scrollRight = document.getElementById('scrollRight');
+        let isDragV = false, isDragH = false;
+        let startY = 0, startX = 0;
+        let startOffsetY = 0, startOffsetX = 0;
+
+        // 拖动时阻止click事件关闭overlay
+        document.addEventListener('click', function(e) {
+            if (isScrollbarDragging) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+        }, true);
+
+        function getMaxOffsetY() {
+            const scaledH = imgNaturalHeight * currentZoom;
+            return Math.max(0, (scaledH - imgViewportH) / 2 / currentZoom);
+        }
+        function getMaxOffsetX() {
+            const scaledW = imgNaturalWidth * currentZoom;
+            return Math.max(0, (scaledW - imgViewportW) / 2 / currentZoom);
+        }
+
+        // 箭头点击
+        scrollUp.addEventListener('click', function(e) {
+            e.stopPropagation();
+            imgOffsetY = Math.min(getMaxOffsetY(), imgOffsetY + 30 / currentZoom);
+            constrainOffset();
+            updateImageTransform();
+            updateScrollbar();
+        });
+        scrollDown.addEventListener('click', function(e) {
+            e.stopPropagation();
+            imgOffsetY = Math.max(-getMaxOffsetY(), imgOffsetY - 30 / currentZoom);
+            constrainOffset();
+            updateImageTransform();
+            updateScrollbar();
+        });
+        scrollLeft.addEventListener('click', function(e) {
+            e.stopPropagation();
+            imgOffsetX = Math.min(getMaxOffsetX(), imgOffsetX + 30 / currentZoom);
+            constrainOffset();
+            updateImageTransform();
+            updateScrollbar();
+        });
+        scrollRight.addEventListener('click', function(e) {
+            e.stopPropagation();
+            imgOffsetX = Math.max(-getMaxOffsetX(), imgOffsetX - 30 / currentZoom);
+            constrainOffset();
+            updateImageTransform();
+            updateScrollbar();
+        });
+
+        // 阻止canvas在滚动条上画字
+        scrollbarV.addEventListener('mousedown', function(e) { e.stopPropagation(); });
+        scrollbarH.addEventListener('mousedown', function(e) { e.stopPropagation(); });
+
+        // thumb拖动
+        thumbV.addEventListener('mousedown', function(e) {
+            isDragV = true;
+            isScrollbarDragging = true;
+            startY = e.clientY;
+            startOffsetY = imgOffsetY;
+            e.stopPropagation();
+            e.preventDefault();
+        });
+
+        thumbH.addEventListener('mousedown', function(e) {
+            isDragH = true;
+            isScrollbarDragging = true;
+            startX = e.clientX;
+            startOffsetX = imgOffsetX;
+            e.stopPropagation();
+            e.preventDefault();
+        });
+
+        // 轨道点击跳转
+        scrollbarV.querySelector('.scroll-track').addEventListener('mousedown', function(e) {
+            if (e.target === thumbV) return;
+            isScrollbarDragging = true;
+            const track = e.currentTarget;
+            const trackRect = track.getBoundingClientRect();
+            const thumbH_val = thumbV.clientHeight;
+            const ratio = (e.clientY - trackRect.top - thumbH_val/2) / (trackRect.height - thumbH_val);
+            const maxOffset = getMaxOffsetY();
+            imgOffsetY = maxOffset * (ratio * 2 - 1);
+            constrainOffset();
+            updateImageTransform();
+            updateScrollbar();
+            setTimeout(function() { isScrollbarDragging = false; }, 100);
+            e.stopPropagation();
+            e.preventDefault();
+        });
+
+        scrollbarH.querySelector('.scroll-track').addEventListener('mousedown', function(e) {
+            if (e.target === thumbH) return;
+            isScrollbarDragging = true;
+            const track = e.currentTarget;
+            const trackRect = track.getBoundingClientRect();
+            const thumbW_val = thumbH.clientWidth;
+            const ratio = (e.clientX - trackRect.left - thumbW_val/2) / (trackRect.width - thumbW_val);
+            const maxOffset = getMaxOffsetX();
+            imgOffsetX = maxOffset * (ratio * 2 - 1);
+            constrainOffset();
+            updateImageTransform();
+            updateScrollbar();
+            setTimeout(function() { isScrollbarDragging = false; }, 100);
+            e.stopPropagation();
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', function(e) {
+            if (isDragV) {
+                const track = scrollbarV.querySelector('.scroll-track');
+                const trackRect = track.getBoundingClientRect();
+                const thumbH_val = thumbV.clientHeight;
+                const dy = e.clientY - startY;
+                const ratio = dy / (trackRect.height - thumbH_val);
+                const maxOffset = getMaxOffsetY();
+                imgOffsetY = startOffsetY + maxOffset * 2 * ratio;
+                constrainOffset();
+                updateImageTransform();
+                updateScrollbar();
+            }
+            if (isDragH) {
+                const track = scrollbarH.querySelector('.scroll-track');
+                const trackRect = track.getBoundingClientRect();
+                const thumbW_val = thumbH.clientWidth;
+                const dx = e.clientX - startX;
+                const ratio = dx / (trackRect.width - thumbW_val);
+                const maxOffset = getMaxOffsetX();
+                imgOffsetX = startOffsetX + maxOffset * 2 * ratio;
+                constrainOffset();
+                updateImageTransform();
+                updateScrollbar();
+            }
+        });
+
+        document.addEventListener('mouseup', function() {
+            if (isDragV || isDragH) {
+                isDragV = false;
+                isDragH = false;
+                // 延迟清除，让后续的 click 事件能检测到
+                setTimeout(function() { isScrollbarDragging = false; }, 100);
+            }
+        });
+    }
+
+    let imgNaturalWidth = 0, imgNaturalHeight = 0;
+    let imgViewportW = 0, imgViewportH = 0;
+
+    // 初始化拖拽
+    initDrag();
+    initScrollbar();
 
     document.addEventListener('keydown', function(e) {
         const overlay = document.getElementById('overlay');
