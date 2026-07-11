@@ -414,22 +414,14 @@ function prevSong() {
     });
 
     function setTool(tool) {
-        // 再次点击同一工具则取消
-        if (drawTool === tool) {
-            drawTool = '';
-            document.getElementById('dtPen').classList.remove('active');
-            document.getElementById('dtHighlighter').classList.remove('active');
-            document.getElementById('dtEraser').classList.remove('active');
-            canvas.style.pointerEvents = 'none';
-        } else {
-            drawTool = tool;
-            document.getElementById('dtPen').classList.toggle('active', tool === 'pen');
-            document.getElementById('dtHighlighter').classList.toggle('active', tool === 'highlighter');
-            document.getElementById('dtEraser').classList.toggle('active', tool === 'eraser');
-            // 画笔模式下允许canvas接收事件
-            canvas.style.cursor = 'crosshair';
-            canvas.style.pointerEvents = 'auto';
-        }
+        // 选中当前工具，不支持取消（去除toggle-off逻辑）
+        drawTool = tool;
+        document.getElementById('dtPen').classList.toggle('active', tool === 'pen');
+        document.getElementById('dtHighlighter').classList.toggle('active', tool === 'highlighter');
+        document.getElementById('dtEraser').classList.toggle('active', tool === 'eraser');
+        // 允许canvas接收绘制事件
+        canvas.style.cursor = 'crosshair';
+        canvas.style.pointerEvents = 'auto';
     }
 
     function updateColor() {
