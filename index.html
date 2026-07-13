@@ -320,10 +320,10 @@ function prevSong() {
                     </div>
                 </div>
                 <div class="card-body">
-                        <h3>今日作业（）</h3>
-                        <div class="hw-text">（1）<br>（2）</div>
+                        <h3>今日作业（7.13）</h3>
+                        <div class="hw-text">（1）355-356页-->周一下午放学之前收<br>（2）357-358页-->周二下午放学之前收</div>
                         <h3>近期学习任务</h3>
-                        <div class="hw-text">（1）<br>（2）<br>（3）<br>（4）7.8和7.9→期末考试(选修1+2+3)<br>（5）<br>（6）<br>（7）<br>（8）</div>
+                        <div class="hw-text">（1）第一单元《运动学》复习<br>（2）第二单元《力学》复习<br>（3）作业都是当天收<br>（4）<br>（5）</div>
 
                 </div>
             </div>
@@ -483,7 +483,12 @@ function prevSong() {
     });
 
     // 触摸支持
+    // canvas默认不拦截触控，让滑动条等元素能收到touch事件
+    canvas.style.pointerEvents = 'none';
+
+    // canvas触控绘制
     canvas.addEventListener('touchstart', function(e) {
+        if (canvas.style.pointerEvents === 'none') return;
         e.preventDefault();
         drawing = true;
         document.getElementById('imgViewport').style.cursor = 'default';
@@ -507,6 +512,7 @@ function prevSong() {
     });
 
     canvas.addEventListener('touchmove', function(e) {
+        if (canvas.style.pointerEvents === 'none') return;
         e.preventDefault();
         if (!drawing) return;
         const t = e.touches[0];
@@ -745,6 +751,9 @@ function prevSong() {
         // 阻止canvas在滚动条上画字
         scrollbarV.addEventListener('mousedown', function(e) { e.stopPropagation(); });
         scrollbarH.addEventListener('mousedown', function(e) { e.stopPropagation(); });
+        // 触控笔同理，阻止冒泡防止触发overlay关闭
+        scrollbarV.addEventListener('touchstart', function(e) { e.stopPropagation(); });
+        scrollbarH.addEventListener('touchstart', function(e) { e.stopPropagation(); });
 
         // thumb拖动
         thumbV.addEventListener('mousedown', function(e) {
@@ -832,6 +841,96 @@ function prevSong() {
                 isDragV = false;
                 isDragH = false;
                 // 延迟清除，让后续的 click 事件能检测到
+                setTimeout(function() { isScrollbarDragging = false; }, 100);
+            }
+        });
+
+        // ===== 触控笔/触摸支持 =====
+        thumbV.addEventListener('touchstart', function(e) {
+            isDragV = true;
+            isScrollbarDragging = true;
+            startY = e.touches[0].clientY;
+            startOffsetY = imgOffsetY;
+            e.stopPropagation();
+            e.preventDefault();
+        });
+
+        thumbH.addEventListener('touchstart', function(e) {
+            isDragH = true;
+            isScrollbarDragging = true;
+            startX = e.touches[0].clientX;
+            startOffsetX = imgOffsetX;
+            e.stopPropagation();
+            e.preventDefault();
+        });
+
+        scrollbarV.querySelector('.scroll-track').addEventListener('touchstart', function(e) {
+            if (e.target === thumbV) return;
+            isScrollbarDragging = true;
+            const track = e.currentTarget;
+            const trackRect = track.getBoundingClientRect();
+            const thumbH_val = thumbV.clientHeight;
+            const ratio = (e.touches[0].clientY - trackRect.top - thumbH_val/2) / (trackRect.height - thumbH_val);
+            const maxOffset = getMaxOffsetY();
+            imgOffsetY = maxOffset * (ratio * 2 - 1);
+            constrainOffset();
+            updateImageTransform();
+            updateScrollbar();
+            setTimeout(function() { isScrollbarDragging = false; }, 100);
+            e.stopPropagation();
+            e.preventDefault();
+        });
+
+        scrollbarH.querySelector('.scroll-track').addEventListener('touchstart', function(e) {
+            if (e.target === thumbH) return;
+            isScrollbarDragging = true;
+            const track = e.currentTarget;
+            const trackRect = track.getBoundingClientRect();
+            const thumbW_val = thumbH.clientWidth;
+            const ratio = (e.touches[0].clientX - trackRect.left - thumbW_val/2) / (trackRect.width - thumbW_val);
+            const maxOffset = getMaxOffsetX();
+            imgOffsetX = maxOffset * (ratio * 2 - 1);
+            constrainOffset();
+            updateImageTransform();
+            updateScrollbar();
+            setTimeout(function() { isScrollbarDragging = false; }, 100);
+            e.stopPropagation();
+            e.preventDefault();
+        });
+
+        document.addEventListener('touchmove', function(e) {
+            if (isDragV) {
+                const track = scrollbarV.querySelector('.scroll-track');
+                const trackRect = track.getBoundingClientRect();
+                const thumbH_val = thumbV.clientHeight;
+                const dy = e.touches[0].clientY - startY;
+                const ratio = dy / (trackRect.height - thumbH_val);
+                const maxOffset = getMaxOffsetY();
+                imgOffsetY = startOffsetY + maxOffset * 2 * ratio;
+                constrainOffset();
+                updateImageTransform();
+                updateScrollbar();
+                e.preventDefault();
+            }
+            if (isDragH) {
+                const track = scrollbarH.querySelector('.scroll-track');
+                const trackRect = track.getBoundingClientRect();
+                const thumbW_val = thumbH.clientWidth;
+                const dx = e.touches[0].clientX - startX;
+                const ratio = dx / (trackRect.width - thumbW_val);
+                const maxOffset = getMaxOffsetX();
+                imgOffsetX = startOffsetX + maxOffset * 2 * ratio;
+                constrainOffset();
+                updateImageTransform();
+                updateScrollbar();
+                e.preventDefault();
+            }
+        });
+
+        document.addEventListener('touchend', function() {
+            if (isDragV || isDragH) {
+                isDragV = false;
+                isDragH = false;
                 setTimeout(function() { isScrollbarDragging = false; }, 100);
             }
         });
