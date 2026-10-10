@@ -1,928 +1,297 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>桐城中学--叶老师教学</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei", sans-serif;
-            line-height: 1.8;
-            color: #333;
-            background: #f0f2f5;
-            min-height: 100vh;
-        }
-        header {
-            text-align: center;
-            padding: 0;
-            background: linear-gradient(135deg, #5c0000 0%, #8B0000 20%, #C41E3A 50%, #8B0000 80%, #5c0000 100%);
-            color: white;
-            position: relative;
-            overflow: hidden;
-            min-height: 166px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 20px rgba(139,0,0,0.5);
-        }
-        /* 红金纹理背景 */
-        header::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-image:
-                radial-gradient(ellipse at 20% 50%, rgba(255,215,0,0.08) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 50%, rgba(255,215,0,0.08) 0%, transparent 50%),
-                radial-gradient(ellipse at 50% 0%, rgba(255,100,0,0.1) 0%, transparent 60%);
-            pointer-events: none;
-        }
-        /* 顶部装饰线 */
-        header::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #FFD700, #FFA500, #FFD700);
-        }
-        .header-content {
-            position: relative;
-            z-index: 1;
-            padding: 22px 10mm 15px;
-            width: 100%;
-            max-width: 100%;
-        }
-        .motto {
-            font-family: 'Ma Shan Zheng', cursive;
-            font-size: clamp(60px, 9.8vw, 166px);
-            color: #FFD700;
-            text-shadow: 0 0 18px rgba(255,215,0,0.8), 0 0 36px rgba(255,165,0,0.6), 0 4px 6px rgba(0,0,0,0.4);
-            letter-spacing: 13px;
-            line-height: 1.05;
-            white-space: nowrap;
-            font-weight: normal;
-        }
-        .header-bg-img {
-            position: absolute;
-            right: 0;
-            bottom: 0;
-            height: 100%;
-            width: auto;
-            object-fit: contain;
-            object-position: right bottom;
-            pointer-events: none;
-            z-index: 1;
-        }
-        .header-bottom-border {
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #FFD700, #FFA500, #FFD700);
-        }
-        .container { max-width: 100%; margin: 0; padding: 30px 20px; }
-        .two-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; height: calc(100vh - 190px); }
-        @media (max-width: 900px) { .two-columns { grid-template-columns: 1fr; } }
-        .card { background: white; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); overflow: hidden; height: 100%; display: flex; flex-direction: column; }
-        .card-header { padding: 20px 25px; font-size: 1.3em; font-weight: 600; display: flex; align-items: center; gap: 10px; color: white; }
-        .homework-header { background: linear-gradient(135deg, #667eea, #764ba2); }
-        .answer-header { background: linear-gradient(135deg, #11998e, #38ef7d); }
-        .card-body { padding: 25px; flex: 1; overflow-y: auto; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>高考物理题型点拨 · 例9—例15 答案对页</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    background: #f0f4f8;
+    color: #2d3748;
+    line-height: 1.6;
+    padding: 20px;
+    zoom: 1.2;
+  }
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    overflow: hidden;
+  }
+  header {
+    background: linear-gradient(135deg, #1a365d 0%, #2b6cb0 100%);
+    color: #fff;
+    padding: 28px 32px;
+  }
+  header h1 { font-size: 24px; margin-bottom: 6px; }
+  header p { font-size: 14px; opacity: 0.85; }
 
-        h3 { color: #667eea; margin: 18px 0 8px; font-size: 3.0em; } #改标题大小
-        
-        h3:first-child { margin-top: 0; }
-        
-        .hw-text { font-size: 2.5em; line-height: 2; color: #000; } #改内容文字大小
-        
-        .answer-content { display: flex; flex-direction: column; gap: 16px; }
-        .answer-item { background: #f8f9fa; border-radius: 8px; padding: 15px; border-left: 4px solid #11998e; }
-        .answer-item h4 { color: #11998e; margin-bottom: 10px; font-size: 1em; }
-        .ans-text { background: #e8f5e9; padding: 12px 15px; border-radius: 6px; font-family: Consolas, Monaco, monospace; font-size: 0.95em; color: #d32f2f; line-height: 1.6; }
-        .zoom-img { max-width: 100%; border-radius: 6px; cursor: pointer; transition: transform 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .zoom-img:hover { transform: scale(1.02); box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
-        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 9999; justify-content: center; align-items: center; }
-        #overlay.show { display: flex; }
-        #overlay .img-wrapper { position: relative; width: 96vw; height: 82vh; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; margin-top: 60px; border: 2px solid rgba(255,255,255,0.3); border-radius: 8px; background: rgba(0,0,0,0.2); }
-        #overlay .img-viewport { width: 100%; height: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; }
-        #overlay .img-viewport:active { cursor: default; }
-        #overlay img { max-width: none; max-height: none; object-fit: contain; border-radius: 4px; cursor: inherit; transition: transform 0.1s; position: absolute; user-select: none; pointer-events: none; z-index: 1; }
-        /* 滚动条样式 - 带箭头细长型 */
-        #overlay .scrollbar-v { position: absolute; right: 6px; top: 6px; bottom: 6px; width: 16px; background: rgba(240,240,240,0.9); border: 1px solid #aaa; border-radius: 3px; display: none; z-index: 50; user-select: none; }
-        #overlay .scrollbar-h { position: absolute; bottom: 6px; left: 6px; right: 6px; height: 16px; background: rgba(240,240,240,0.9); border: 1px solid #aaa; border-radius: 3px; display: none; z-index: 50; user-select: none; }
-        #overlay .scroll-arrow { position: absolute; width: 100%; height: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #555; font-size: 10px; background: rgba(220,220,220,0.9); }
-        #overlay .scroll-arrow:hover { background: rgba(200,200,200,0.95); color: #000; }
-        #overlay .scrollbar-v .scroll-arrow-up { top: 0; border-bottom: 1px solid #aaa; border-radius: 3px 3px 0 0; }
-        #overlay .scrollbar-v .scroll-arrow-down { bottom: 0; border-top: 1px solid #aaa; border-radius: 0 0 3px 3px; }
-        #overlay .scrollbar-h .scroll-arrow-left { left: 0; top: 0; height: 100%; width: 16px; border-right: 1px solid #aaa; border-radius: 3px 0 0 3px; }
-        #overlay .scrollbar-h .scroll-arrow-right { right: 0; top: 0; height: 100%; width: 16px; border-left: 1px solid #aaa; border-radius: 0 3px 3px 0; }
-        #overlay .scroll-track { position: absolute; background: rgba(240,240,240,0.9); }
-        #overlay .scrollbar-v .scroll-track { top: 17px; bottom: 17px; left: 0; right: 0; }
-        #overlay .scrollbar-h .scroll-track { left: 17px; right: 17px; top: 0; bottom: 0; }
-        #overlay .scrollbar-thumb { position: absolute; background: #888; border-radius: 3px; cursor: pointer; }
-        #overlay .scrollbar-v .scrollbar-thumb { width: 100%; left: 0; }
-        #overlay .scrollbar-h .scrollbar-thumb { height: 100%; top: 0; }
-        #overlay .scrollbar-thumb:hover { background: #555; }
-        #overlay .zoom-bar { position: fixed; top: 70px; right: 76px; z-index: 10001; display: flex; align-items: center; gap: 15px; }
-        #overlay .zoom-btn { background: rgba(255,255,255,0.2); color: white; border: none; font-size: 24px; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; transition: background 0.2s; }
-        #overlay .zoom-btn:hover { background: rgba(255,255,255,0.4); }
-        #overlay .zoom-level { color: white; font-size: 16px; min-width: 60px; text-align: center; }
-        #overlay .nav-bar { position: fixed; bottom: 20px; right: 76px; z-index: 10001; display: flex; align-items: center; justify-content: center; gap: 30px; }
-        #overlay .nav-btn { background: rgba(255,255,255,0.15); color: white; border: none; font-size: 18px; padding: 8px 24px; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
-        #overlay .nav-btn:hover { background: rgba(255,255,255,0.3); }
-        #overlay .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-        #overlay .page-indicator { color: rgba(255,255,255,0.7); font-size: 15px; }
-        #overlay .close-btn { position: fixed; top: 20px; right: 30px; color: white; font-size: 36px; cursor: pointer; opacity: 0.7; z-index: 10000; line-height: 1; }
-        #overlay .close-btn:hover { opacity: 1; }
-        #overlay canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 15; pointer-events: none; user-select: none; }
-        #overlay .draw-toolbar { position: fixed; top: 20px; left: 20px; z-index: 10002; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-        #overlay .draw-toolbar .dt-btn { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 14px; transition: background 0.2s; white-space: nowrap; }
-        #overlay .draw-toolbar .dt-btn:hover { background: rgba(255,255,255,0.3); }
-        #overlay .draw-toolbar .dt-btn.active { background: rgba(255,215,0,0.6); border-color: #FFD700; }
-        #overlay .draw-toolbar input[type=color] { width: 36px; height: 36px; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; cursor: pointer; background: transparent; padding: 2px; }
-        #overlay .draw-toolbar input[type=range] { width: 80px; accent-color: #FFD700; }
-        .missing { color: #e57373; font-style: italic; }
-        .placeholder { color: #999; font-style: italic; text-align: center; padding: 60px 20px; }
-        footer { text-align: center; padding: 30px; color: #666; font-size: 0.9em; }
-        .homework-header {
-            position: relative;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .music-player {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-left: auto;
-            background: rgba(255,255,255,0.1);
-            border-radius: 50px;
-            padding: 4px 14px 4px 6px;
-        }
-        .music-player .m-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-            line-height: 1;
-        }
-        .music-player .m-btn:hover { background: rgba(255,255,255,0.25); }
-        .music-player .m-btn.play-btn {
-            width: 36px;
-            height: 36px;
-            font-size: 20px;
-            background: rgba(255,255,255,0.2);
-        }
-        .music-player .m-btn.play-btn:hover { background: rgba(255,255,255,0.4); }
-        .music-player .song-info {
-            color: rgba(255,255,255,0.9);
-            font-size: 12px;
-            max-width: 160px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin-left: 2px;
-        }
-    </style>
+  .answer-quick {
+    background: #fffbeb;
+    border-bottom: 2px solid #f6e05e;
+    padding: 18px 32px;
+  }
+  .answer-quick h2 {
+    font-size: 16px;
+    color: #975a16;
+    margin-bottom: 10px;
+  }
+  .answer-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .answer-item {
+    background: #fff;
+    border: 1px solid #f6e05e;
+    border-radius: 8px;
+    padding: 10px 12px;
+    text-align: center;
+  }
+  .answer-item .num {
+    font-size: 13px;
+    color: #718096;
+    margin-bottom: 2px;
+  }
+  .answer-item .ans {
+    font-size: 20px;
+    font-weight: bold;
+    color: #c53030;
+  }
+
+  .detail-list { padding: 24px 32px; }
+  .detail-item {
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .detail-head {
+    background: #edf2f7;
+    padding: 12px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+  }
+  .detail-head:hover { background: #e2e8f0; }
+  .detail-head .title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #2d3748;
+  }
+  .detail-head .ans-badge {
+    background: #c53030;
+    color: #fff;
+    padding: 3px 14px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+  }
+  .detail-body {
+    padding: 16px 18px;
+    display: none;
+  }
+  .detail-item.open .detail-body { display: block; }
+  .detail-item.open .detail-head { background: #bee3f8; }
+
+  .topic {
+    display: inline-block;
+    background: #ebf8ff;
+    color: #2b6cb0;
+    padding: 2px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    margin-bottom: 8px;
+  }
+  .analysis {
+    font-size: 14px;
+    color: #4a5568;
+  }
+  .analysis p { margin-bottom: 8px; }
+  .analysis .key {
+    color: #c53030;
+    font-weight: 600;
+  }
+  .formula {
+    background: #f7fafc;
+    border-left: 3px solid #2b6cb0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "Cambria Math", "Times New Roman", serif;
+    font-size: 14px;
+  }
+
+  footer {
+    text-align: center;
+    padding: 16px;
+    font-size: 12px;
+    color: #a0aec0;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  @media (max-width: 600px) {
+    .answer-grid { grid-template-columns: repeat(2, 1fr); }
+    header, .answer-quick, .detail-list { padding-left: 16px; padding-right: 16px; }
+  }
+</style>
 </head>
 <body>
-<audio id="bg-music-file" src="" loop preload="auto"></audio><script>
-const musicList = ["Dancing With Your Ghost.mp3", "Jar Of Love (Album Version).mp3", "一笑江湖.mp3", "与你到永久.mp3", "关山酒 (降调版).mp3", "半壶纱 (DJ名龙版).mp3", "卓玛.mp3", "南方姑娘.mp3", "可能.mp3", "周杰伦-东风破.mp3", "咏春.mp3", "大风在刮大雪在下 (合唱团版).mp3", "如果当时.mp3", "安和桥.mp3", "小城画师.mp3", "小美满.mp3", "弱水三千 (0.8x丨DJ苏熠鸣版).mp3", "归去来兮.mp3", "我本将心向明月.mp3", "折风渡夜 (0.8x版丨DJ墨韩Mix版).mp3", "探故知 (超梦幻DJ版).mp3", "探窗.mp3", "方大同-麦恩莉.mp3", "春庭雪.mp3", "晚风.mp3", "桥边姑娘.mp3", "此去半生 (青衣戏腔版).mp3", "浮云散.mp3", "游京 (滔滔江水).mp3", "相思遥 (变调版).mp3", "童话镇.mp3", "胡夏-一壶莲花醉.mp3", "胡广生.mp3", "落了白.mp3", "许嵩&何曼婷-素颜.mp3", "误闯天家 (0.8倍慢速DJ版).mp3", "走卒.mp3", "辞九门回忆.mp3", "陶喆-二十二.mp3", "陶喆-蝴蝶.mp3", "难却 (DJ版0.85x丨待上浓妆好戏开场).mp3", "青丝 (0.8x) (DJ版).mp3", "鸳鸯戏 (哎呦小情郎你莫愁) (0.9x).mp3"];
+<div class="container">
+  <header>
+    <h1>高考物理108个题型点拨 · 答案对页</h1>
+    <p>例9 — 例15 ｜ 建议先独立完成，再点开下方解析核对</p>
+  </header>
 
-var musicPlaying = false;
-var currentSongIndex = -1;
-
-function pickRandomSong() {
-    if (musicList.length === 0) return null;
-    var idx = Math.floor(Math.random() * musicList.length);
-    currentSongIndex = idx;
-    return musicList[idx];
-}
-
-function getSongDisplayName(filename) {
-    return filename.replace(/^\d+/, '').replace(/\.mp3$/i, '');
-}
-
-function playSong(filename) {
-    var m = document.getElementById("bg-music-file");
-    var info = document.getElementById("song-info");
-    m.src = "音乐/" + filename;
-    m.play().catch(function(){});
-    info.textContent = getSongDisplayName(filename);
-    info.title = getSongDisplayName(filename);
-    musicPlaying = true;
-    updatePlayBtn();
-}
-
-function updatePlayBtn() {
-    var btn = document.getElementById("play-pause-btn");
-    btn.innerHTML = musicPlaying ? "⏸" : "▶";
-}
-
-function toggleMusic() {
-    var m = document.getElementById("bg-music-file");
-    if (musicPlaying) {
-        m.pause();
-        musicPlaying = false;
-        updatePlayBtn();
-    } else {
-        if (currentSongIndex < 0) {
-            var song = pickRandomSong();
-            if (!song) return;
-            playSong(song);
-        } else {
-            m.play().catch(function(){});
-            musicPlaying = true;
-            updatePlayBtn();
-        }
-    }
-}
-
-function nextSong() {
-    if (musicList.length === 0) return;
-    var nextIdx = (currentSongIndex + 1) % musicList.length;
-    currentSongIndex = nextIdx;
-    playSong(musicList[nextIdx]);
-}
-
-function prevSong() {
-    if (musicList.length === 0) return;
-    var prevIdx = (currentSongIndex - 1 + musicList.length) % musicList.length;
-    currentSongIndex = prevIdx;
-    playSong(musicList[prevIdx]);
-}
-</script>
-    <header>
-        <img src="透明奋斗图.png" class="header-bg-img" alt="">
-        <div class="header-content">
-            <div class="motto">锲而不舍 &nbsp;金石可镂</div>
-            <div class="header-bottom-border"></div>
-        </div>
-    </header>
-    <div id="overlay" onclick="if(event.target===this)closeZoom()">
-        <canvas id="drawCanvas"></canvas>
-        <span class="close-btn" onclick="closeZoom()">&times;</span>
-        <div class="draw-toolbar" id="drawToolbar" style="display:none;">
-            <button class="dt-btn" id="dtPen" onclick="setTool('pen')">✏️ 画笔</button>
-            <button class="dt-btn" id="dtHighlighter" onclick="setTool('highlighter')">🖍️ 荧光笔</button>
-            <button class="dt-btn" id="dtEraser" onclick="setTool('eraser')">🧹 橡皮</button>
-            <input type="color" id="dtColor" value="#FF0000" onchange="updateColor()" title="颜色">
-            <input type="range" id="dtSize" min="1" max="20" value="3" oninput="updateSize()" title="粗细">
-            <button class="dt-btn" onclick="clearCanvas()">🗑️ 清除</button>
-        </div>
-        <div class="img-wrapper">
-            <div class="zoom-bar">
-                <button class="zoom-btn" onclick="zoomOut()">−</button>
-                <span class="zoom-level" id="zoomLevel">100%</span>
-                <button class="zoom-btn" onclick="zoomIn()">+</button>
-            </div>
-            <div class="img-viewport" id="imgViewport">
-                <img id="zoomed-img" src="" alt="">
-                <!-- 垂直滚动条 -->
-                <div class="scrollbar-v" id="scrollbarV">
-                    <div class="scroll-arrow scroll-arrow-up" id="scrollUp">▲</div>
-                    <div class="scroll-track"><div class="scrollbar-thumb" id="scrollThumbV"></div></div>
-                    <div class="scroll-arrow scroll-arrow-down" id="scrollDown">▼</div>
-                </div>
-                <!-- 水平滚动条 -->
-                <div class="scrollbar-h" id="scrollbarH">
-                    <div class="scroll-arrow scroll-arrow-left" id="scrollLeft">◀</div>
-                    <div class="scroll-track"><div class="scrollbar-thumb" id="scrollThumbH"></div></div>
-                    <div class="scroll-arrow scroll-arrow-right" id="scrollRight">▶</div>
-                </div>
-            </div>
-            <div class="nav-bar">
-                <button class="nav-btn" id="prevBtn" onclick="prevImg()">&#9664; 上一页</button>
-                <span class="page-indicator" id="pageIndicator">1 / 1</span>
-                <button class="nav-btn" id="nextBtn" onclick="nextImg()">下一页 &#9654;</button>
-            </div>
-        </div>
+  <div class="answer-quick">
+    <h2>📋 答案速查表</h2>
+    <div class="answer-grid">
+      <div class="answer-item"><div class="num">例9</div><div class="ans">AC</div></div>
+      <div class="answer-item"><div class="num">例10</div><div class="ans">D</div></div>
+      <div class="answer-item"><div class="num">例11</div><div class="ans">BD</div></div>
+      <div class="answer-item"><div class="num">例12</div><div class="ans">AD</div></div>
+      <div class="answer-item"><div class="num">例13</div><div class="ans">C</div></div>
+      <div class="answer-item"><div class="num">例14</div><div class="ans">D</div></div>
+      <div class="answer-item"><div class="num">例15</div><div class="ans">ABC</div></div>
     </div>
-    <div class="container">
-        <div class="two-columns">
-            <div class="card">
-                <div class="card-header homework-header">
-                    <span>&#128221;</span><span>作业布置</span>
-                                        <div class="music-player">
-                        <button class="m-btn" onclick="prevSong()" title="上一首">⏮</button>
-                        <button class="m-btn play-btn" id="play-pause-btn" onclick="toggleMusic()" title="播放/暂停">▶</button>
-                        <button class="m-btn" onclick="nextSong()" title="下一首">⏭</button>
-                        <span class="song-info" id="song-info" title="">未播放</span>
-                    </div>
-                </div>
-                <div class="card-body">
-                        <h3>今日作业（10.10）</h3>
-                        <div class="hw-text">（1）《13讲》作业-->周日晚上交<br>（2）《专题8》-->提前做一下-->周一复习<br>（3）<br>（4）</div>
-                        <h3>近期学习任务</h3>
-                        <div class="hw-text">（1）第五单元《万有引力》复习<br>（2）第六单元《机械能》复习<br>（3）<br>（4）</div>
+  </div>
 
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-header answer-header">
-                    <span>&#9989;</span><span>答案核对</span>
-                </div>
-                <div class="card-body">
-                    <div class="answer-content">
-                        <div class="answer-item">
-                            <img src="答案/1.jpg" class="zoom-img" onclick="openGallery(0)">
-                        </div>
+  <div class="detail-list">
 
-                    </div>
-                </div>
-            </div>
+    <div class="detail-item open">
+      <div class="detail-head" onclick="this.parentElement.classList.toggle('open')">
+        <span class="title">例9 · 小球落弹簧（多选）</span>
+        <span class="ans-badge">AC</span>
+      </div>
+      <div class="detail-body">
+        <span class="topic">题型：小球接触弹簧的运动过程分析</span>
+        <div class="analysis">
+          <p>小球刚接触弹簧时，重力 <span class="key">mg &gt; 弹力 kx</span>，合力向下，加速度向下且与速度同向 → 速度增大；随压缩量 x 增大，弹力增大，加速度 <span class="key">a = (mg − kx)/m</span> 逐渐减小。</p>
+          <p>当 kx = mg 时（B点），a = 0，速度达到最大。</p>
+          <p>继续向下，kx &gt; mg，合力向上，加速度向上且逐渐增大，与速度反向 → 速度减小，直到速度为0（C点，压缩最短）。</p>
+          <p><span class="key">结论：加速度先减小后增大，速度先增大后减小。</span> 选 AC。</p>
         </div>
+      </div>
     </div>
-    <footer>
-        <p>桐城中学 · 物理教学组</p>
-        <p>&copy; 2026 叶老师</p>
-    </footer>
-    <script>
-    const answerImages = ['答案/1.jpg'];
-    let currentIndex = 0;
-    let currentZoom = 2.0;
-    let imgOffsetX = 0;
-    let imgOffsetY = 0;
-    let isDragging = false;
-    let dragStartX = 0;
-    let dragStartY = 0;
-    let dragStartOffsetX = 0;
-    let dragStartOffsetY = 0;
 
-    // ===== 绘制功能（全屏canvas）=====
-    const canvas = document.getElementById('drawCanvas');
-    const ctx = canvas.getContext('2d');
-    let drawing = false;
-    let drawTool = 'pen';        // pen | highlighter | eraser
-    let drawColor = '#FF0000';
-    let drawSize = 3;
+    <div class="detail-item open">
+      <div class="detail-head" onclick="this.parentElement.classList.toggle('open')">
+        <span class="title">例10 · 等时圆</span>
+        <span class="ans-badge">D</span>
+      </div>
+      <div class="detail-body">
+        <span class="topic">技巧：等时圆结论</span>
+        <div class="analysis">
+          <p>设圆的半径为 R，任意一条弦与竖直方向夹角为 θ：</p>
+          <div class="formula">弦长 L = 2R·cosθ<br>加速度 a = g·cosθ<br>由 L = ½at² → t = √(2L/a) = √(4R/g)</div>
+          <p><span class="key">时间 t 与角度 θ 无关</span>，只与圆的半径 R 和 g 有关。</p>
+          <p>因此 a、b、c 三点滑到 d 点的时间相等：t₁ = t₂ = t₃。选 D。</p>
+        </div>
+      </div>
+    </div>
 
-    function resizeCanvas() {
-        const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        ctx.putImageData(data, 0, 0);
-    }
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    <div class="detail-item open">
+      <div class="detail-head" onclick="this.parentElement.classList.toggle('open')">
+        <span class="title">例11 · 内力公式（多选）</span>
+        <span class="ans-badge">BD</span>
+      </div>
+      <div class="detail-body">
+        <span class="topic">巧解：内力公式 F内 = (m未/m总)·F</span>
+        <div class="analysis">
+          <p>三个物块质量 m、2m、3m，总质量 6m。</p>
+          <p><strong>R、Q 之间的作用力 F_RQ</strong>（只推 R）：</p>
+          <div class="formula">F_RQ = (m_R / m总)·F = (3m / 6m)·F = F/2</div>
+          <p><strong>Q、P 之间的作用力 F_PQ</strong>（推 Q + R）：</p>
+          <div class="formula">F_PQ = ((m_Q + m_R) / m总)·F = (5m / 6m)·F = 5F/6</div>
+          <p><strong>比值 k = F_RQ / F_PQ</strong> = (F/2) / (5F/6) = <span class="key">3/5</span></p>
+          <p>内力公式中摩擦力（μ）在整体和隔离时被同时约掉，<span class="key">k 与 μ 是否为零无关</span>。故选 BD。</p>
+        </div>
+      </div>
+    </div>
 
-    // 禁止右键菜单
-    canvas.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-    });
+    <div class="detail-item open">
+      <div class="detail-head" onclick="this.parentElement.classList.toggle('open')">
+        <span class="title">例12 · 板块运动 v-t 图像（多选）</span>
+        <span class="ans-badge">AD</span>
+      </div>
+      <div class="detail-body">
+        <span class="topic">题型：板块模型共速后判断</span>
+        <div class="analysis">
+          <p>地面给整体的滑动摩擦力：μ₂(M+m)g，若一起运动，加速度 a = μ₂g。</p>
+          <p>物块 m 需要的静摩擦力 f = ma = mμ₂g，最大静摩擦力约为 μ₁mg。</p>
+          <p><strong>情况一：μ₁ ≥ μ₂</strong> → 所需静摩擦力 ≤ 最大静摩擦力，<span class="key">二者一起减速</span>，v-t 图为同一条直线。对应 <strong>A 正确</strong>，C 错误。</p>
+          <p><strong>情况二：μ₁ &lt; μ₂</strong> → 静摩擦力不足，发生相对滑动：</p>
+          <div class="formula">物块 m：a₁ = μ₁g（减速）<br>木板 M：a_M = [μ₂(M+m)g − μ₁mg] / M &gt; μ₂g &gt; μ₁g</div>
+          <p>木板减速更快（v-t 图线更陡），先停下，物块后停下。对应 <strong>D 正确</strong>，B 错误。</p>
+        </div>
+      </div>
+    </div>
 
-    function setTool(tool) {
-        // 选中当前工具，不支持取消（去除toggle-off逻辑）
-        drawTool = tool;
-        document.getElementById('dtPen').classList.toggle('active', tool === 'pen');
-        document.getElementById('dtHighlighter').classList.toggle('active', tool === 'highlighter');
-        document.getElementById('dtEraser').classList.toggle('active', tool === 'eraser');
-        // 允许canvas接收绘制事件
-        canvas.style.cursor = 'crosshair';
-        canvas.style.pointerEvents = 'auto';
-    }
+    <div class="detail-item open">
+      <div class="detail-head" onclick="this.parentElement.classList.toggle('open')">
+        <span class="title">例13 · μ = tanθ 结论</span>
+        <span class="ans-badge">C</span>
+      </div>
+      <div class="detail-body">
+        <span class="topic">题型：滑块匀速下滑条件</span>
+        <div class="analysis">
+          <p>原来匀速下滑：μmgcosθ = mgsinθ → <span class="key">μ = tanθ</span>。</p>
+          <p>加竖直向下的力 F 后，等效"重力"变为 (mg + F)：</p>
+          <div class="formula">支持力 N = (mg + F)cosθ → 增大（A 对）<br>摩擦力 f = μN = tanθ·(mg+F)cosθ = (mg+F)sinθ → 增大（D 对）<br>沿斜面合力：(mg+F)sinθ − f = 0 → 仍匀速（B 对）</div>
+          <p>题目选<strong>错误</strong>的，"物体将沿斜面加速下滑"（C）错误。选 C。</p>
+        </div>
+      </div>
+    </div>
 
-    function updateColor() {
-        drawColor = document.getElementById('dtColor').value;
-    }
+    <div class="detail-item open">
+      <div class="detail-head" onclick="this.parentElement.classList.toggle('open')">
+        <span class="title">例14 · 斜面平抛</span>
+        <span class="ans-badge">D</span>
+      </div>
+      <div class="detail-body">
+        <span class="topic">题型：斜面平抛的水平位移范围</span>
+        <div class="analysis">
+          <p>落到斜面上时，位移偏角 = 斜面倾角 θ：</p>
+          <div class="formula">tanθ = y/x = (½gt²)/(v₀t) = gt/(2v₀)<br>→ t = 2v₀tanθ/g<br>→ 水平位移 x = v₀t = 2v₀²tanθ/g ∝ v₀²</div>
+          <p><strong>都落到斜面上</strong>：x₁ : x₂ = v₀² : (2v₀)² = <span class="key">1 : 4</span></p>
+          <p><strong>都落到水平面上</strong>：下落高度相同 → 时间 t 相同，x ∝ v₀ → 比值 <span class="key">1 : 2</span></p>
+          <p>所以实际比值在 <strong>1:2 ~ 1:4</strong> 之间（含端点）。1:5 超出范围，不可能。选 D。</p>
+        </div>
+      </div>
+    </div>
 
-    function updateSize() {
-        drawSize = parseInt(document.getElementById('dtSize').value);
-    }
+    <div class="detail-item open">
+      <div class="detail-head" onclick="this.parentElement.classList.toggle('open')">
+        <span class="title">例15 · 皮带传动比例（多选）</span>
+        <span class="ans-badge">ABC</span>
+      </div>
+      <div class="detail-body">
+        <span class="topic">方法：列表法解传动问题</span>
+        <div class="analysis">
+          <p>半径：r_A = 3r，r_B = r，r_C = 2r。</p>
+          <p><strong>第一步：A、B 同轴 → ω 相同</strong>，设 ω_A = ω_B = ω₁：</p>
+          <div class="formula">v_A = ω₁·3r ， v_B = ω₁·r → v_A : v_B = 3 : 1</div>
+          <p><strong>第二步：B、C 皮带传动 → v 相同</strong>：</p>
+          <div class="formula">v_C = v_B = ω₁·r<br>ω_C = v_C / (2r) = ω₁/2</div>
+          <p><strong>线速度之比</strong> v_A : v_B : v_C = 3 : 1 : 1 → <strong>B 正确</strong></p>
+          <p><strong>角速度之比</strong> ω_A : ω_B : ω_C = ω₁ : ω₁ : ω₁/2 = 2 : 2 : 1 → <strong>C 正确</strong></p>
+          <p><strong>向心加速度</strong> a = v·ω：</p>
+          <div class="formula">a_A = 3ω₁r · ω₁ = 3ω₁²r<br>a_B = ω₁r · ω₁ = ω₁²r<br>a_C = ω₁r · ω₁/2 = ½ω₁²r</div>
+          <p>a_A : a_B : a_C = 3 : 1 : 0.5 = <span class="key">6 : 2 : 1</span> → <strong>A 正确，D 错误</strong>。</p>
+        </div>
+      </div>
+    </div>
 
-    function clearCanvas() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
+  </div>
 
-    canvas.addEventListener('mousedown', function(e) {
-        drawing = true;
-        // 画笔模式下改变视口光标
-        document.getElementById('imgViewport').style.cursor = 'default';
-        ctx.beginPath();
-        ctx.moveTo(e.clientX, e.clientY);
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        if (drawTool === 'eraser') {
-            ctx.globalCompositeOperation = 'destination-out';
-            ctx.lineWidth = drawSize * 3;
-        } else if (drawTool === 'highlighter') {
-            ctx.globalCompositeOperation = 'source-over';
-            ctx.strokeStyle = drawColor + '60';
-            ctx.lineWidth = drawSize * 4;
-        } else {
-            ctx.globalCompositeOperation = 'source-over';
-            ctx.strokeStyle = drawColor;
-            ctx.lineWidth = drawSize;
-        }
-    });
-
-    canvas.addEventListener('mousemove', function(e) {
-        // 绘制时保持默认光标
-        if (drawing) {
-            canvas.style.cursor = 'default';
-        }
-        if (!drawing) return;
-        ctx.lineTo(e.clientX, e.clientY);
-        ctx.stroke();
-    });
-
-    // 鼠标进入 canvas 时检查光标
-    canvas.addEventListener('mouseenter', function() {
-        if (drawing) {
-            canvas.style.cursor = 'default';
-        }
-    });
-
-    canvas.addEventListener('mouseup', function() {
-        drawing = false;
-    });
-    canvas.addEventListener('mouseleave', function() {
-        drawing = false;
-    });
-
-    // 触摸支持
-    // canvas默认不拦截触控，让滑动条等元素能收到touch事件
-    canvas.style.pointerEvents = 'none';
-
-    // canvas触控绘制
-    canvas.addEventListener('touchstart', function(e) {
-        if (canvas.style.pointerEvents === 'none') return;
-        e.preventDefault();
-        drawing = true;
-        document.getElementById('imgViewport').style.cursor = 'default';
-        const t = e.touches[0];
-        ctx.beginPath();
-        ctx.moveTo(t.clientX, t.clientY);
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        if (drawTool === 'eraser') {
-            ctx.globalCompositeOperation = 'destination-out';
-            ctx.lineWidth = drawSize * 3;
-        } else if (drawTool === 'highlighter') {
-            ctx.globalCompositeOperation = 'source-over';
-            ctx.strokeStyle = drawColor + '60';
-            ctx.lineWidth = drawSize * 4;
-        } else {
-            ctx.globalCompositeOperation = 'source-over';
-            ctx.strokeStyle = drawColor;
-            ctx.lineWidth = drawSize;
-        }
-    });
-
-    canvas.addEventListener('touchmove', function(e) {
-        if (canvas.style.pointerEvents === 'none') return;
-        e.preventDefault();
-        if (!drawing) return;
-        const t = e.touches[0];
-        ctx.lineTo(t.clientX, t.clientY);
-        ctx.stroke();
-    });
-
-    canvas.addEventListener('touchend', function() {
-        drawing = false;
-    });
-
-    function openGallery(index) {
-        currentIndex = index;
-        currentZoom = 2.0;
-        document.getElementById('overlay').classList.add('show');
-        document.getElementById('drawToolbar').style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-        showImage(index);
-    }
-
-    function updateImageTransform() {
-        const img = document.getElementById('zoomed-img');
-        img.style.transform = 'scale(' + currentZoom + ') translate(' + imgOffsetX + 'px, ' + imgOffsetY + 'px)';
-    }
-
-    function constrainOffset() {
-        const img = document.getElementById('zoomed-img');
-        const viewport = document.getElementById('imgViewport');
-        if (!img || !viewport) return;
-        
-        const rect = img.getBoundingClientRect();
-        const vpRect = viewport.getBoundingClientRect();
-        
-        // 计算图片实际显示尺寸
-        const scaledWidth = rect.width;
-        const scaledHeight = rect.height;
-        
-        // 如果图片小于视口，居中显示
-        if (scaledWidth <= vpRect.width) {
-            imgOffsetX = 0;
-        } else {
-            // 限制偏移范围，确保边缘不会进入视口内太多
-            const maxOffset = (scaledWidth - vpRect.width) / (2 * currentZoom);
-            imgOffsetX = Math.max(-maxOffset, Math.min(maxOffset, imgOffsetX));
-        }
-        
-        if (scaledHeight <= vpRect.height) {
-            imgOffsetY = 0;
-        } else {
-            const maxOffset = (scaledHeight - vpRect.height) / (2 * currentZoom);
-            imgOffsetY = Math.max(-maxOffset, Math.min(maxOffset, imgOffsetY));
-        }
-    }
-
-    function showImage(index) {
-        const img = document.getElementById('zoomed-img');
-        const viewport = document.getElementById('imgViewport');
-        const scrollbarV = document.getElementById('scrollbarV');
-        const scrollbarH = document.getElementById('scrollbarH');
-        currentZoom = 2.0;
-        imgOffsetX = 0;
-        imgOffsetY = 0;
-        img.onload = function() {
-            imgNaturalWidth = img.naturalWidth;
-            imgNaturalHeight = img.naturalHeight;
-            imgViewportW = viewport.clientWidth;
-            imgViewportH = viewport.clientHeight;
-            updateScrollbar();
-            updateImageTransform();
-        };
-        img.src = answerImages[index];
-        document.getElementById('zoomLevel').textContent = Math.round(currentZoom * 100) + '%';
-        const total = answerImages.length;
-        document.getElementById('pageIndicator').textContent = (index + 1) + ' / ' + total;
-        document.getElementById('prevBtn').disabled = (index === 0);
-        document.getElementById('nextBtn').disabled = (index === total - 1);
-        updateImageTransform();
-    }
-
-    function updateScrollbar() {
-        const scrollbarV = document.getElementById('scrollbarV');
-        const scrollbarH = document.getElementById('scrollbarH');
-        const thumbV = document.getElementById('scrollThumbV');
-        const thumbH = document.getElementById('scrollThumbH');
-        
-        const scaledW = imgNaturalWidth * currentZoom;
-        const scaledH = imgNaturalHeight * currentZoom;
-        const showV = scaledH > imgViewportH;
-        const showH = scaledW > imgViewportW;
-        
-        scrollbarV.style.display = showV ? 'block' : 'none';
-        scrollbarH.style.display = showH ? 'block' : 'none';
-        
-        // 计算thumb大小
-        if (showV) {
-            const trackH = scrollbarV.querySelector('.scroll-track').clientHeight;
-            const thumbH_px = Math.max(20, trackH * (imgViewportH / scaledH));
-            thumbV.style.height = thumbH_px + 'px';
-            // 设置thumb位置
-            const maxOffsetY = (scaledH - imgViewportH) / 2 / currentZoom;
-            if (maxOffsetY > 0) {
-                const pos = (imgOffsetY + maxOffsetY) / (2 * maxOffsetY);
-                const trackTop = scrollbarV.querySelector('.scroll-track').offsetTop;
-                thumbV.style.top = (trackTop + pos * (trackH - thumbH_px)) + 'px';
-            }
-        }
-        if (showH) {
-            const trackW = scrollbarH.querySelector('.scroll-track').clientWidth;
-            const thumbW_px = Math.max(20, trackW * (imgViewportW / scaledW));
-            thumbH.style.width = thumbW_px + 'px';
-            const maxOffsetX = (scaledW - imgViewportW) / 2 / currentZoom;
-            if (maxOffsetX > 0) {
-                const pos = (imgOffsetX + maxOffsetX) / (2 * maxOffsetX);
-                const trackLeft = scrollbarH.querySelector('.scroll-track').offsetLeft;
-                thumbH.style.left = (trackLeft + pos * (trackW - thumbW_px)) + 'px';
-            }
-        }
-    }
-
-    function zoomIn() {
-        if (currentZoom < 5) {
-            currentZoom += 0.25;
-            constrainOffset();
-            updateImageTransform();
-            updateScrollbar();
-            document.getElementById('zoomLevel').textContent = Math.round(currentZoom * 100) + '%';
-        }
-    }
-
-    function zoomOut() {
-        if (currentZoom > 0.5) {
-            currentZoom -= 0.25;
-            if (currentZoom <= 1.0) {
-                imgOffsetX = 0;
-                imgOffsetY = 0;
-            }
-            constrainOffset();
-            updateImageTransform();
-            updateScrollbar();
-            document.getElementById('zoomLevel').textContent = Math.round(currentZoom * 100) + '%';
-        }
-    }
-
-    function nextImg() {
-        if (currentIndex < answerImages.length - 1) {
-            currentIndex++;
-            currentZoom = 2.0;
-            showImage(currentIndex);
-        }
-    }
-
-    function prevImg() {
-        if (currentIndex > 0) {
-            currentIndex--;
-            currentZoom = 2.0;
-            showImage(currentIndex);
-        }
-    }
-
-    // 拖拽功能已移除，改用滑动条
-    function initDrag() {}
-
-    function closeZoom() {
-        document.getElementById('overlay').classList.remove('show');
-        document.getElementById('drawToolbar').style.display = 'none';
-        document.body.style.overflow = '';
-        clearCanvas();
-        imgOffsetX = 0;
-        imgOffsetY = 0;
-        currentZoom = 2.0;
-        canvas.style.pointerEvents = 'none';
-    }
-
-    // 滚动条拖动功能
-    let isScrollbarDragging = false;
-    function initScrollbar() {
-        const scrollbarV = document.getElementById('scrollbarV');
-        const scrollbarH = document.getElementById('scrollbarH');
-        const thumbV = document.getElementById('scrollThumbV');
-        const thumbH = document.getElementById('scrollThumbH');
-        const scrollUp = document.getElementById('scrollUp');
-        const scrollDown = document.getElementById('scrollDown');
-        const scrollLeft = document.getElementById('scrollLeft');
-        const scrollRight = document.getElementById('scrollRight');
-        let isDragV = false, isDragH = false;
-        let startY = 0, startX = 0;
-        let startOffsetY = 0, startOffsetX = 0;
-
-        // 拖动时阻止click事件关闭overlay
-        document.addEventListener('click', function(e) {
-            if (isScrollbarDragging) {
-                e.stopPropagation();
-                e.preventDefault();
-            }
-        }, true);
-
-        function getMaxOffsetY() {
-            const scaledH = imgNaturalHeight * currentZoom;
-            return Math.max(0, (scaledH - imgViewportH) / 2 / currentZoom);
-        }
-        function getMaxOffsetX() {
-            const scaledW = imgNaturalWidth * currentZoom;
-            return Math.max(0, (scaledW - imgViewportW) / 2 / currentZoom);
-        }
-
-        // 箭头点击
-        scrollUp.addEventListener('click', function(e) {
-            e.stopPropagation();
-            imgOffsetY = Math.min(getMaxOffsetY(), imgOffsetY + 30 / currentZoom);
-            constrainOffset();
-            updateImageTransform();
-            updateScrollbar();
-        });
-        scrollDown.addEventListener('click', function(e) {
-            e.stopPropagation();
-            imgOffsetY = Math.max(-getMaxOffsetY(), imgOffsetY - 30 / currentZoom);
-            constrainOffset();
-            updateImageTransform();
-            updateScrollbar();
-        });
-        scrollLeft.addEventListener('click', function(e) {
-            e.stopPropagation();
-            imgOffsetX = Math.min(getMaxOffsetX(), imgOffsetX + 30 / currentZoom);
-            constrainOffset();
-            updateImageTransform();
-            updateScrollbar();
-        });
-        scrollRight.addEventListener('click', function(e) {
-            e.stopPropagation();
-            imgOffsetX = Math.max(-getMaxOffsetX(), imgOffsetX - 30 / currentZoom);
-            constrainOffset();
-            updateImageTransform();
-            updateScrollbar();
-        });
-
-        // 阻止canvas在滚动条上画字
-        scrollbarV.addEventListener('mousedown', function(e) { e.stopPropagation(); });
-        scrollbarH.addEventListener('mousedown', function(e) { e.stopPropagation(); });
-        // 触控笔同理，阻止冒泡防止触发overlay关闭
-        scrollbarV.addEventListener('touchstart', function(e) { e.stopPropagation(); });
-        scrollbarH.addEventListener('touchstart', function(e) { e.stopPropagation(); });
-
-        // thumb拖动
-        thumbV.addEventListener('mousedown', function(e) {
-            isDragV = true;
-            isScrollbarDragging = true;
-            startY = e.clientY;
-            startOffsetY = imgOffsetY;
-            e.stopPropagation();
-            e.preventDefault();
-        });
-
-        thumbH.addEventListener('mousedown', function(e) {
-            isDragH = true;
-            isScrollbarDragging = true;
-            startX = e.clientX;
-            startOffsetX = imgOffsetX;
-            e.stopPropagation();
-            e.preventDefault();
-        });
-
-        // 轨道点击跳转
-        scrollbarV.querySelector('.scroll-track').addEventListener('mousedown', function(e) {
-            if (e.target === thumbV) return;
-            isScrollbarDragging = true;
-            const track = e.currentTarget;
-            const trackRect = track.getBoundingClientRect();
-            const thumbH_val = thumbV.clientHeight;
-            const ratio = (e.clientY - trackRect.top - thumbH_val/2) / (trackRect.height - thumbH_val);
-            const maxOffset = getMaxOffsetY();
-            imgOffsetY = maxOffset * (ratio * 2 - 1);
-            constrainOffset();
-            updateImageTransform();
-            updateScrollbar();
-            setTimeout(function() { isScrollbarDragging = false; }, 100);
-            e.stopPropagation();
-            e.preventDefault();
-        });
-
-        scrollbarH.querySelector('.scroll-track').addEventListener('mousedown', function(e) {
-            if (e.target === thumbH) return;
-            isScrollbarDragging = true;
-            const track = e.currentTarget;
-            const trackRect = track.getBoundingClientRect();
-            const thumbW_val = thumbH.clientWidth;
-            const ratio = (e.clientX - trackRect.left - thumbW_val/2) / (trackRect.width - thumbW_val);
-            const maxOffset = getMaxOffsetX();
-            imgOffsetX = maxOffset * (ratio * 2 - 1);
-            constrainOffset();
-            updateImageTransform();
-            updateScrollbar();
-            setTimeout(function() { isScrollbarDragging = false; }, 100);
-            e.stopPropagation();
-            e.preventDefault();
-        });
-
-        document.addEventListener('mousemove', function(e) {
-            if (isDragV) {
-                const track = scrollbarV.querySelector('.scroll-track');
-                const trackRect = track.getBoundingClientRect();
-                const thumbH_val = thumbV.clientHeight;
-                const dy = e.clientY - startY;
-                const ratio = dy / (trackRect.height - thumbH_val);
-                const maxOffset = getMaxOffsetY();
-                imgOffsetY = startOffsetY + maxOffset * 2 * ratio;
-                constrainOffset();
-                updateImageTransform();
-                updateScrollbar();
-            }
-            if (isDragH) {
-                const track = scrollbarH.querySelector('.scroll-track');
-                const trackRect = track.getBoundingClientRect();
-                const thumbW_val = thumbH.clientWidth;
-                const dx = e.clientX - startX;
-                const ratio = dx / (trackRect.width - thumbW_val);
-                const maxOffset = getMaxOffsetX();
-                imgOffsetX = startOffsetX + maxOffset * 2 * ratio;
-                constrainOffset();
-                updateImageTransform();
-                updateScrollbar();
-            }
-        });
-
-        document.addEventListener('mouseup', function() {
-            if (isDragV || isDragH) {
-                isDragV = false;
-                isDragH = false;
-                // 延迟清除，让后续的 click 事件能检测到
-                setTimeout(function() { isScrollbarDragging = false; }, 100);
-            }
-        });
-
-        // ===== 触控笔/触摸支持 =====
-        thumbV.addEventListener('touchstart', function(e) {
-            isDragV = true;
-            isScrollbarDragging = true;
-            startY = e.touches[0].clientY;
-            startOffsetY = imgOffsetY;
-            e.stopPropagation();
-            e.preventDefault();
-        });
-
-        thumbH.addEventListener('touchstart', function(e) {
-            isDragH = true;
-            isScrollbarDragging = true;
-            startX = e.touches[0].clientX;
-            startOffsetX = imgOffsetX;
-            e.stopPropagation();
-            e.preventDefault();
-        });
-
-        scrollbarV.querySelector('.scroll-track').addEventListener('touchstart', function(e) {
-            if (e.target === thumbV) return;
-            isScrollbarDragging = true;
-            const track = e.currentTarget;
-            const trackRect = track.getBoundingClientRect();
-            const thumbH_val = thumbV.clientHeight;
-            const ratio = (e.touches[0].clientY - trackRect.top - thumbH_val/2) / (trackRect.height - thumbH_val);
-            const maxOffset = getMaxOffsetY();
-            imgOffsetY = maxOffset * (ratio * 2 - 1);
-            constrainOffset();
-            updateImageTransform();
-            updateScrollbar();
-            setTimeout(function() { isScrollbarDragging = false; }, 100);
-            e.stopPropagation();
-            e.preventDefault();
-        });
-
-        scrollbarH.querySelector('.scroll-track').addEventListener('touchstart', function(e) {
-            if (e.target === thumbH) return;
-            isScrollbarDragging = true;
-            const track = e.currentTarget;
-            const trackRect = track.getBoundingClientRect();
-            const thumbW_val = thumbH.clientWidth;
-            const ratio = (e.touches[0].clientX - trackRect.left - thumbW_val/2) / (trackRect.width - thumbW_val);
-            const maxOffset = getMaxOffsetX();
-            imgOffsetX = maxOffset * (ratio * 2 - 1);
-            constrainOffset();
-            updateImageTransform();
-            updateScrollbar();
-            setTimeout(function() { isScrollbarDragging = false; }, 100);
-            e.stopPropagation();
-            e.preventDefault();
-        });
-
-        document.addEventListener('touchmove', function(e) {
-            if (isDragV) {
-                const track = scrollbarV.querySelector('.scroll-track');
-                const trackRect = track.getBoundingClientRect();
-                const thumbH_val = thumbV.clientHeight;
-                const dy = e.touches[0].clientY - startY;
-                const ratio = dy / (trackRect.height - thumbH_val);
-                const maxOffset = getMaxOffsetY();
-                imgOffsetY = startOffsetY + maxOffset * 2 * ratio;
-                constrainOffset();
-                updateImageTransform();
-                updateScrollbar();
-                e.preventDefault();
-            }
-            if (isDragH) {
-                const track = scrollbarH.querySelector('.scroll-track');
-                const trackRect = track.getBoundingClientRect();
-                const thumbW_val = thumbH.clientWidth;
-                const dx = e.touches[0].clientX - startX;
-                const ratio = dx / (trackRect.width - thumbW_val);
-                const maxOffset = getMaxOffsetX();
-                imgOffsetX = startOffsetX + maxOffset * 2 * ratio;
-                constrainOffset();
-                updateImageTransform();
-                updateScrollbar();
-                e.preventDefault();
-            }
-        });
-
-        document.addEventListener('touchend', function() {
-            if (isDragV || isDragH) {
-                isDragV = false;
-                isDragH = false;
-                setTimeout(function() { isScrollbarDragging = false; }, 100);
-            }
-        });
-    }
-
-    let imgNaturalWidth = 0, imgNaturalHeight = 0;
-    let imgViewportW = 0, imgViewportH = 0;
-
-    // 初始化拖拽
-    initDrag();
-    initScrollbar();
-
-    document.addEventListener('keydown', function(e) {
-        const overlay = document.getElementById('overlay');
-        if (!overlay.classList.contains('show')) return;
-        if (e.key === 'Escape') closeZoom();
-        if (e.key === 'ArrowRight') nextImg();
-        if (e.key === 'ArrowLeft') prevImg();
-        if (e.key === '+' || e.key === '=') { zoomIn(); e.preventDefault(); }
-        if (e.key === '-') { zoomOut(); e.preventDefault(); }
-        if (e.key === 'd' || e.key === 'D') {
-            const tb = document.getElementById('drawToolbar');
-            tb.style.display = tb.style.display === 'none' ? 'flex' : 'none';
-        }
-    });
-    </script>
+  <footer>
+    点击每道题标题可展开 / 收起解析 ｜ 答案速查表建议先遮住、独立做完再核对
+  </footer>
+</div>
 </body>
 </html>
