@@ -2,623 +2,207 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>近期学生物理考试反思总结</title>
+<title>机车启动模型 —— 速度·力·功率·加速度对应关系表</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <style>
-  :root {
-    --ink: #16233a;
-    --ink-soft: #4a5a72;
-    --ink-faint: #7b8aa0;
-    --brand: #1d4ed8;
-    --brand-deep: #123a9c;
-    --brand-soft: #eaf0ff;
-    --line: #e2e8f2;
-    --bg: #f4f6fa;
-    --card: #ffffff;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--ink);
-    font-family: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", -apple-system, "Segoe UI", sans-serif;
-    font-size: 16px;
-    line-height: 1.85;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  /* ---------- 顶部头图 ---------- */
-  header.hero {
-    background: linear-gradient(135deg, #123a9c 0%, #1d4ed8 55%, #3b76f0 100%);
-    color: #fff;
-    padding: 52px 24px 46px;
-    position: relative;
-    overflow: hidden;
-  }
-  header.hero::after {
-    content: "";
-    position: absolute;
-    right: -80px;
-    top: -80px;
-    width: 320px;
-    height: 320px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.07);
-  }
-  header.hero::before {
-    content: "";
-    position: absolute;
-    left: -60px;
-    bottom: -140px;
-    width: 260px;
-    height: 260px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.05);
-  }
-  .hero-inner {
-    max-width: 920px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 2;
-  }
-  .hero-tag {
-    display: inline-block;
-    font-size: 13px;
-    letter-spacing: 1px;
-    background: rgba(255, 255, 255, 0.16);
-    border: 1px solid rgba(255, 255, 255, 0.28);
-    padding: 4px 14px;
-    border-radius: 999px;
-    margin-bottom: 18px;
-  }
-  h1 {
-    margin: 0 0 12px;
-    font-size: 32px;
-    line-height: 1.35;
-    letter-spacing: 1px;
-    font-weight: 700;
-  }
-  .hero-sub {
-    margin: 0;
-    font-size: 15px;
-    color: rgba(255, 255, 255, 0.86);
-  }
-
-  /* ---------- 导航 ---------- */
-  nav {
-    position: sticky;
-    top: 0;
-    z-index: 20;
-    background: rgba(255, 255, 255, 0.96);
-    backdrop-filter: blur(6px);
-    border-bottom: 1px solid var(--line);
-    box-shadow: 0 2px 10px rgba(20, 40, 90, 0.05);
-  }
-  .nav-inner {
-    max-width: 920px;
-    margin: 0 auto;
-    display: flex;
-    gap: 4px;
-    padding: 0 16px;
-    overflow-x: auto;
-  }
-  .nav-inner a {
-    flex: none;
-    padding: 15px 18px;
-    font-size: 15px;
-    color: var(--ink-soft);
-    text-decoration: none;
-    border-bottom: 3px solid transparent;
-    transition: color .18s, border-color .18s;
-    white-space: nowrap;
-  }
-  .nav-inner a:hover { color: var(--brand); }
-  .nav-inner a.active {
-    color: var(--brand-deep);
-    font-weight: 700;
-    border-bottom-color: var(--brand);
-  }
-
-  /* ---------- 主体 ---------- */
-  main { max-width: 920px; margin: 0 auto; padding: 34px 16px 60px; }
-  section.page { display: none; animation: fade .28s ease; }
-  section.page.active { display: block; }
-  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-
-  .page-title {
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--ink);
-    margin: 0 0 6px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .page-title::before {
-    content: "";
-    width: 6px;
-    height: 22px;
-    border-radius: 3px;
-    background: linear-gradient(180deg, #1d4ed8, #6d9dff);
-  }
-  .page-lead {
-    color: var(--ink-faint);
-    font-size: 14px;
-    margin: 0 0 22px;
-    padding-left: 16px;
-  }
-
-  .card {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 22px 24px;
-    margin-bottom: 16px;
-    box-shadow: 0 2px 14px rgba(20, 40, 90, 0.045);
-  }
-
-  /* 概览数字块 */
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-    margin-bottom: 18px;
-  }
-  .stat {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 20px 18px;
-    text-align: center;
-    box-shadow: 0 2px 14px rgba(20, 40, 90, 0.045);
-  }
-  .stat b {
-    display: block;
-    font-size: 34px;
-    line-height: 1.2;
-    color: var(--brand-deep);
-    font-weight: 800;
-  }
-  .stat span { font-size: 13px; color: var(--ink-faint); }
-
-  /* 维度标签 */
-  .dims { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 0; }
-  .dim {
-    background: var(--brand-soft);
-    color: var(--brand-deep);
-    border: 1px solid #cddaff;
-    border-radius: 999px;
-    padding: 6px 16px;
-    font-size: 14px;
-    font-weight: 600;
-  }
-
-  /* 结论框 */
-  .conclude {
-    background: linear-gradient(100deg, #f7f9ff 0%, #ffffff 65%);
-    border: 1px solid #d5e0fb;
-    border-left: 5px solid var(--brand);
-    border-radius: 12px;
-    padding: 20px 24px;
-    margin-top: 18px;
-    font-size: 16px;
-    color: var(--ink);
-  }
-  .conclude strong { color: var(--brand-deep); }
-
-  /* ---------- 共性问题卡 ---------- */
-  .prob {
-    display: flex;
-    gap: 16px;
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 20px 22px;
-    margin-bottom: 14px;
-    box-shadow: 0 2px 14px rgba(20, 40, 90, 0.045);
-    transition: transform .18s, box-shadow .18s;
-  }
-  .prob:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 22px rgba(20, 40, 90, 0.10);
-  }
-  .prob .no {
-    flex: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 11px;
-    background: linear-gradient(140deg, #1d4ed8, #5b8cf5);
-    color: #fff;
-    font-size: 15px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    letter-spacing: 0;
-  }
-  .prob h3 {
-    margin: 2px 0 8px;
-    font-size: 17px;
-    font-weight: 700;
-    color: var(--ink);
-  }
-  .prob p {
-    margin: 0;
-    color: var(--ink-soft);
-    font-size: 15.5px;
-  }
-  .tags { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
-  .tag {
-    font-size: 12.5px;
-    color: #8a5a12;
-    background: #fff6e5;
-    border: 1px solid #f3ddb2;
-    border-radius: 6px;
-    padding: 3px 10px;
-  }
-
-  /* ---------- 建议时间线 ---------- */
-  .timeline { position: relative; padding-left: 34px; }
-  .timeline::before {
-    content: "";
-    position: absolute;
-    left: 11px;
-    top: 8px;
-    bottom: 8px;
-    width: 2px;
-    background: linear-gradient(180deg, #1d4ed8, #c9d8fb);
-  }
-  .step { position: relative; margin-bottom: 22px; }
-  .step::before {
-    content: "";
-    position: absolute;
-    left: -28px;
-    top: 6px;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: #fff;
-    border: 3px solid var(--brand);
-  }
-  .step h3 { margin: 0 0 6px; font-size: 17px; font-weight: 700; }
-  .step p { margin: 0; color: var(--ink-soft); font-size: 15.5px; }
-  .step .aim {
-    display: inline-block;
-    margin-top: 10px;
-    font-size: 13px;
-    color: var(--brand-deep);
-    background: var(--brand-soft);
-    border: 1px solid #d5e0fb;
-    border-radius: 6px;
-    padding: 3px 10px;
-  }
-
-  /* ---------- 对照表 ---------- */
-  .table-wrap {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    overflow: hidden;
-    box-shadow: 0 2px 14px rgba(20, 40, 90, 0.045);
-  }
-  table { width: 100%; border-collapse: collapse; font-size: 15px; }
-  thead th {
-    background: #f0f4fc;
-    color: var(--ink);
-    font-weight: 700;
-    text-align: left;
-    padding: 14px 18px;
-    border-bottom: 1px solid var(--line);
-    font-size: 15px;
-  }
-  tbody td {
-    padding: 14px 18px;
-    border-bottom: 1px solid #eef1f7;
-    color: var(--ink-soft);
-    vertical-align: top;
-  }
-  tbody tr:last-child td { border-bottom: none; }
-  tbody tr:hover { background: #fafbfe; }
-  td.pid { color: var(--brand-deep); font-weight: 700; white-space: nowrap; }
-  td.sid { color: var(--brand-deep); font-weight: 700; white-space: nowrap; }
-  .note {
-    margin-top: 14px;
-    font-size: 13.5px;
-    color: var(--ink-faint);
-    background: #fbfcfe;
-    border: 1px dashed var(--line);
-    border-radius: 10px;
-    padding: 12px 16px;
-  }
-
-  footer {
-    border-top: 1px solid var(--line);
-    background: #eef1f7;
-    color: var(--ink-faint);
-    text-align: center;
-    font-size: 13.5px;
-    padding: 22px 16px;
-  }
-
-  @media (max-width: 720px) {
-    h1 { font-size: 24px; }
-    header.hero { padding: 38px 18px 34px; }
-    .stats { grid-template-columns: 1fr; }
-    .card, .prob { padding: 18px; }
-    table { font-size: 14px; }
-    thead th, tbody td { padding: 11px 12px; }
-  }
-
-  /* ---------- 打印：全部展开 ---------- */
-  @media print {
-    body { background: #fff; }
-    header.hero { background: #123a9c !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    nav { display: none; }
-    section.page { display: block !important; page-break-before: always; }
-    section.page:first-of-type { page-break-before: avoid; }
-    .prob, .card, .table-wrap { box-shadow: none; break-inside: avoid; }
-  }
+  body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; max-width: 1100px; margin: 30px auto; padding: 0 20px; color: #222; line-height: 1.7; background: #fafafa; }
+  h1 { text-align: center; color: #1a4480; border-bottom: 3px solid #1a4480; padding-bottom: 10px; }
+  h2 { color: #fff; background: #1a4480; padding: 8px 14px; border-radius: 6px; margin-top: 36px; }
+  h3 { color: #1a4480; border-left: 5px solid #e07b00; padding-left: 10px; margin-top: 26px; }
+  table { border-collapse: collapse; width: 100%; margin: 14px 0; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  th, td { border: 1px solid #b8c4d6; padding: 9px 12px; text-align: center; vertical-align: middle; }
+  th { background: #e8eef7; color: #1a4480; font-weight: bold; }
+  td.left { text-align: left; }
+  .key { background: #fff4e0; font-weight: bold; }
+  .note { background: #eef7ee; border-left: 4px solid #3a8a3a; padding: 10px 14px; margin: 12px 0; border-radius: 4px; }
+  .warn { background: #fdecec; border-left: 4px solid #c0392b; padding: 10px 14px; margin: 12px 0; border-radius: 4px; }
+  .formula { font-size: 1.05em; }
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 12px; color: #fff; font-size: 0.9em; margin-right: 6px; }
+  .tag1 { background: #2e7d32; }
+  .tag2 { background: #ef6c00; }
+  .tag3 { background: #546e7a; }
+  ul { margin: 6px 0 6px 20px; }
 </style>
-<noscript><style>section.page { display: block !important; }</style></noscript>
 </head>
 <body>
 
-<header class="hero">
-  <div class="hero-inner">
-    <div class="hero-tag">教学反思 · 学情分析</div>
-    <h1>近期学生物理考试反思总结</h1>
-    <p class="hero-sub">基于多份学生反思材料的共性问题分析与教学改进建议　·　2026年10月</p>
-  </div>
-</header>
+<h1>机车启动模型：速度 v、牵引力 F、功率 P、加速度 a 对应关系表</h1>
 
-<nav>
-  <div class="nav-inner">
-    <a href="#overview" data-page="overview">概览</a>
-    <a href="#problems" data-page="problems">共性问题</a>
-    <a href="#actions" data-page="actions">改进建议</a>
-    <a href="#mapping" data-page="mapping">问题对策对照</a>
-  </div>
-</nav>
+<div class="note">
+<b>共同基本关系（任何时刻都成立）：</b>
+$$P = F\,v, \qquad F - f = m\,a$$
+其中 $f$ 为阻力（恒定），$m$ 为机车质量，$P$ 为实际功率，$P_{\text{额}}$ 为额定功率。
+</div>
 
-<main>
+<!-- ==================== 模型一 ==================== -->
+<h2>模型一：以恒定功率启动（$P = P_{\text{额}}$ 从一开始就满功率）</h2>
 
-  <!-- ============ 第 1 页 概览 ============ -->
-  <section class="page" id="overview">
-    <div class="page-title">总体情况</div>
-    <p class="page-lead">整体态度端正，失分集中在习惯与策略而非知识本身</p>
+<p>启动瞬间即以额定功率运行，速度从小到大逐渐增加，直到最大速度后匀速。</p>
 
-    <div class="stats">
-      <div class="stat"><b>7</b><span>类共性失分问题</span></div>
-      <div class="stat"><b>5</b><span>条教学改进建议</span></div>
-      <div class="stat"><b>4</b><span>个问题集中维度</span></div>
-    </div>
+<table>
+  <tr>
+    <th style="width:14%">物理量</th>
+    <th style="width:22%">表达式</th>
+    <th style="width:20%">变化趋势（随时间 $t$）</th>
+    <th>说明 / 临界点</th>
+  </tr>
+  <tr>
+    <td><b>功率 $P$</b></td>
+    <td class="formula">$P = P_{\text{额}}$</td>
+    <td>不变（恒定）</td>
+    <td class="left tdt">从 $t=0$ 起就达到额定功率，发动机"油门踩到底"。</td>
+  </tr>
+  <tr>
+    <td><b>速度 $v$</b></td>
+    <td class="formula">$v = \dfrac{P_{\text{额}}}{F}$</td>
+    <td>逐渐增大，最后趋于 $v_m$</td>
+    <td class="left">不能突变：$t=0$ 时 $v=0$，此时牵引力 $F$ 极大（理论上）。</td>
+  </tr>
+  <tr>
+    <td><b>牵引力 $F$</b></td>
+    <td class="formula">$F = \dfrac{P_{\text{额}}}{v}$</td>
+    <td>随 $v$ 增大而<b>减小</b></td>
+    <td class="left">$v$ 越大，$F$ 越小；当 $F = f$ 时加速度为零。</td>
+  </tr>
+  <tr>
+    <td><b>加速度 $a$</b></td>
+    <td class="formula">$a = \dfrac{F - f}{m} = \dfrac{1}{m}\!\left(\dfrac{P_{\text{额}}}{v} - f\right)$</td>
+    <td>随 $v$ 增大而<b>减小</b>（变加速）</td>
+    <td class="left">$a$ 与 $v$ 成反比关系，速度越大加速度越小。</td>
+  </tr>
+  <tr class="key">
+    <td><b>最大速度 $v_m$</b></td>
+    <td class="formula">$v_m = \dfrac{P_{\text{额}}}{f}$</td>
+    <td>—（最终达到）</td>
+    <td class="left">当 $F = f$，$a=0$，速度不再增加，此后机车做<b>匀速直线运动</b>。</td>
+  </tr>
+</table>
 
-    <div class="card">
-      <p style="margin:0;color:var(--ink-soft);">本次收集的多份学生物理考试反思材料显示，同学们都能够正视本次考试成绩起伏，认真剖析失分根源，主动规划后续改进方案，整体学习态度端正，有较强上进心。多数同学没有因为一次考试失利丧失信心，希望借助反思找准自身短板、调整学习状态。综合所有反思，学生问题集中体现在学习习惯、答题策略、应试心态、知识掌握四大维度，共性特征非常突出。</p>
-      <div class="dims">
-        <span class="dim">学习习惯</span>
-        <span class="dim">答题策略</span>
-        <span class="dim">应试心态</span>
-        <span class="dim">知识掌握</span>
-      </div>
-    </div>
+<div class="note">
+<b>运动性质：</b>
+$t=0 \to$ 变加速直线运动（$a$ 逐渐减小）$\to$ $F=f$ 时 $\to$ <b>匀速直线运动</b>（速度 $v_m$）。
+<br><b>$v-t$ 图：</b>斜率（即 $a$）逐渐变小，曲线向上凸，最后变成一条水平线。
+</div>
 
-    <div class="conclude">
-      总体来看，<strong>大部分失分不是完全不会</strong>，而是不良做题习惯、答题策略、考场心态叠加造成。只要逐项落实改进、坚持踏实训练，学生的物理成绩仍有较大提升空间。
-    </div>
-  </section>
+<!-- ==================== 模型二 ==================== -->
+<h2>模型二：以恒定加速度启动（先匀加速，后变加速，最后匀速）</h2>
 
-  <!-- ============ 第 2 页 共性问题 ============ -->
-  <section class="page" id="problems">
-    <div class="page-title">共性问题分析</div>
-    <p class="page-lead">按反思材料中出现的问题归纳为七类，前两类最为普遍</p>
+<p>启动阶段保持牵引力恒定、加速度恒定，做匀加速直线运动；当功率增大到额定功率后，功率不能再升，进入第二阶段。</p>
 
-    <div class="prob">
-      <div class="no">一</div>
-      <div>
-        <h3>审题粗心，低级失误频发</h3>
-        <p>这是本次反思中最普遍的问题。大量同学存在读题漏看关键条件、看错物理量、混淆题干限定条件的情况；很多题目本身知识点已经掌握，却因审题失误丢掉十几分。这类“会而不对”的失分非常可惜，反映出平时做题没有养成圈画关键词的习惯，读题浮躁。</p>
-        <div class="tags"><span class="tag">漏看关键条件</span><span class="tag">看错物理量</span><span class="tag">会而不对</span></div>
-      </div>
-    </div>
+<h3>阶段划分对照表</h3>
+<table>
+  <tr>
+    <th style="width:16%">阶段</th>
+    <th style="width:18%">运动性质</th>
+    <th style="width:20%">牵引力 $F$</th>
+    <th style="width:20%">功率 $P$</th>
+    <th style="width:14%">速度 $v$</th>
+    <th style="width:12%">加速度 $a$</th>
+  </tr>
+  <tr>
+    <td><span class="tag tag1">阶段一</span><br>匀加速</td>
+    <td>匀加速直线运动</td>
+    <td class="formula">$F = f + m\,a_0$<br><b>恒定</b></td>
+    <td class="formula">$P = F\,v = (f+ma_0)\,v$<br><b>随 $v$ 增大而增大</b></td>
+    <td class="formula">$v = a_0 t$</td>
+    <td class="formula">$a_0$ <b>恒定</b></td>
+  </tr>
+  <tr>
+    <td><span class="tag tag2">转折点</span><br>$P=P_{\text{额}}$</td>
+    <td>匀加速结束瞬间</td>
+    <td class="formula">$F_1 = f + m\,a_0$</td>
+    <td class="formula">$P = P_{\text{额}}$（达到额定功率）</td>
+    <td class="formula">$v_1 = \dfrac{P_{\text{额}}}{f + m\,a_0}$</td>
+    <td class="formula">$a_0$</td>
+  </tr>
+  <tr>
+    <td><span class="tag tag2">阶段二</span><br>变加速</td>
+    <td>变加速直线运动<br>（$a$ 逐渐减小）</td>
+    <td class="formula">$F = \dfrac{P_{\text{额}}}{v}$<br><b>随 $v$ 增大而减小</b></td>
+    <td class="formula">$P = P_{\text{额}}$<br><b>保持恒定</b></td>
+    <td class="formula">继续增大</td>
+    <td class="formula">$a=\dfrac{F-f}{m}$<br><b>逐渐减小</b></td>
+  </tr>
+  <tr>
+    <td><span class="tag tag3">阶段三</span><br>匀速</td>
+    <td>匀速直线运动</td>
+    <td class="formula">$F = f$</td>
+    <td class="formula">$P = P_{\text{额}}$</td>
+    <td class="formula">$v_m = \dfrac{P_{\text{额}}}{f}$<br><b>（最大速度）</b></td>
+    <td class="formula">$a = 0$</td>
+  </tr>
+</table>
 
-    <div class="prob">
-      <div class="no">二</div>
-      <div>
-        <h3>答题策略不合理，时间分配失衡</h3>
-        <p>不少学生遇到难题过度纠结，长时间死磕一道题，挤占后面大题的作答时间，导致后面会做的题目来不及完成，也缺少检查时间。部分同学随意跳题、做题顺序混乱，考场缺少“先易后难、合理取舍”的答题意识。</p>
-        <div class="tags"><span class="tag">死磕难题</span><span class="tag">后题没时间</span><span class="tag">无检查时间</span></div>
-      </div>
-    </div>
+<h3>阶段一：匀加速阶段（$a = a_0$ 不变）</h3>
+<table>
+  <tr><th style="width:20%">物理量</th><th style="width:35%">表达式</th><th>变化规律</th></tr>
+  <tr><td><b>加速度 $a$</b></td><td class="formula">$a = a_0$</td><td class="left">人为设定的恒定加速度，保持不变。</td></tr>
+  <tr><td><b>牵引力 $F$</b></td><td class="formula">$F = f + m\,a_0$</td><td class="left">由牛顿第二定律，$F$ 必须恒定，才能保持 $a$ 恒定。</td></tr>
+  <tr><td><b>速度 $v$</b></td><td class="formula">$v = a_0 t$</td><td class="left">随时间线性增大。</td></tr>
+  <tr><td><b>实际功率 $P$</b></td><td class="formula">$P = F\,v = (f+m a_0)\,a_0 t$</td><td class="left"><b>随时间线性增大</b>，直到 $P = P_{\text{额}}$ 为止。</td></tr>
+  <tr class="key">
+    <td><b>阶段一结束时<br>速度 $v_1$</b></td>
+    <td class="formula">$v_1 = \dfrac{P_{\text{额}}}{F} = \dfrac{P_{\text{额}}}{f + m\,a_0}$</td>
+    <td class="left">此时功率达到额定功率，<b>匀加速阶段结束</b>。</td>
+  </tr>
+  <tr class="key">
+    <td><b>阶段一持续时间<br>$t_1$</b></td>
+    <td class="formula">$t_1 = \dfrac{v_1}{a_0} = \dfrac{P_{\text{额}}}{a_0(f + m\,a_0)}$</td>
+    <td class="left">匀加速一共能维持多长时间。</td>
+  </tr>
+</table>
 
-    <div class="prob">
-      <div class="no">三</div>
-      <div>
-        <h3>应试心态不稳定</h3>
-        <p>部分学生碰到陌生题型就紧张焦虑、心态慌乱，进而引发计算与审题的连环出错；少数学生容易被前面考题影响情绪，难以快速进入答题状态。心理状态已经明显影响考场发挥。</p>
-        <div class="tags"><span class="tag">陌生题焦虑</span><span class="tag">连环出错</span><span class="tag">情绪受前题影响</span></div>
-      </div>
-    </div>
+<h3>阶段二：变加速阶段（$P = P_{\text{额}}$ 恒定）</h3>
+<table>
+  <tr><th style="width:20%">物理量</th><th style="width:35%">表达式</th><th>变化规律</th></tr>
+  <tr><td><b>功率 $P$</b></td><td class="formula">$P = P_{\text{额}}$</td><td class="left">已经到顶，不能再增大。</td></tr>
+  <tr><td><b>速度 $v$</b></td><td class="formula">从 $v_1$ 继续增大到 $v_m$</td><td class="left">仍然在加速，但加速度越来越小。</td></tr>
+  <tr><td><b>牵引力 $F$</b></td><td class="formula">$F = \dfrac{P_{\text{额}}}{v}$</td><td class="left">$v$ 增大 $\Rightarrow$ $F$ 减小。</td></tr>
+  <tr><td><b>加速度 $a$</b></td><td class="formula">$a = \dfrac{F-f}{m} = \dfrac{1}{m}\!\left(\dfrac{P_{\text{额}}}{v} - f\right)$</td><td class="left">$F$ 减小 $\Rightarrow$ $a$ 减小。</td></tr>
+</table>
 
-    <div class="prob">
-      <div class="no">四</div>
-      <div>
-        <h3>课堂听课效率不足，知识内化不到位</h3>
-        <p>多名同学反思存在上课走神、听课效率低的问题，基础知识点存在漏洞。普遍存在“课上听得懂、独立做题不会”的现象，缺少课后复盘与独立推演的环节，听懂不等于真正掌握。</p>
-        <div class="tags"><span class="tag">上课走神</span><span class="tag">听得懂不会做</span><span class="tag">缺课后复盘</span></div>
-      </div>
-    </div>
+<h3>阶段三：匀速阶段</h3>
+<table>
+  <tr><th style="width:20%">物理量</th><th style="width:35%">表达式</th><th>说明</th></tr>
+  <tr><td><b>牵引力 $F$</b></td><td class="formula">$F = f$</td><td class="left">牵引力等于阻力，合力为零。</td></tr>
+  <tr><td><b>加速度 $a$</b></td><td class="formula">$a = 0$</td><td class="left">速度不再变化。</td></tr>
+  <tr class="key">
+    <td><b>最大速度 $v_m$</b></td>
+    <td class="formula">$v_m = \dfrac{P_{\text{额}}}{f}$</td>
+    <td class="left">与模型一最终速度<b>相同</b>，因为只取决于额定功率和阻力。</td>
+  </tr>
+</table>
 
-    <div class="prob">
-      <div class="no">五</div>
-      <div>
-        <h3>刷题重数量轻质量，错题缺少复盘</h3>
-        <p>遇到难题习惯直接翻看答案，缺少独立思考过程；盲目刷题，同类题型反复出错，没有坚持复盘错题，没有归纳解题思路，知识没有真正消化。</p>
-        <div class="tags"><span class="tag">直接看答案</span><span class="tag">同类题反复错</span><span class="tag">不归纳思路</span></div>
-      </div>
-    </div>
+<!-- ==================== 对比 ==================== -->
+<h2>两种启动方式核心对比</h2>
+<table>
+  <tr>
+    <th style="width:18%">对比项</th>
+    <th style="width:41%">模型一：恒定功率启动</th>
+    <th style="width:41%">模型二：恒定加速度启动</th>
+  </tr>
+  <tr><td><b>启动瞬间功率</b></td><td>直接达到 $P_{\text{额}}$</td><td>从零开始逐渐增大到 $P_{\text{额}}$</td></tr>
+  <tr><td><b>启动瞬间加速度</b></td><td>很大（$F$ 极大）</td><td>由人为设定，较小且恒定</td></tr>
+  <tr><td><b>牵引力变化</b></td><td>从大一直减小到 $f$</td><td>先恒定，再减小到 $f$</td></tr>
+  <tr><td><b>功率变化</b></td><td>始终 $P_{\text{额}}$</td><td>先增大，再保持 $P_{\text{额}}$</td></tr>
+  <tr><td><b>速度图象 $v$-$t$</b></td><td>曲线斜率逐渐减小（上凸曲线）</td><td>先直线上升，再接一段上凸曲线，最后水平</td></tr>
+  <tr><td><b>最终最大速度</b></td><td colspan="2" class="formula" style="text-align:center">$v_m = \dfrac{P_{\text{额}}}{f}$（两种方式完全相同）</td></tr>
+</table>
 
-    <div class="prob">
-      <div class="no">六</div>
-      <div>
-        <h3>计算薄弱，答题书写不规范</h3>
-        <p>公式套用、数值代入频繁出错，草稿书写潦草，简单计算失误较多；实验题、计算题步骤书写不规范，造成不必要扣分，日常练习规范性不足。</p>
-        <div class="tags"><span class="tag">代入出错</span><span class="tag">草稿潦草</span><span class="tag">步骤不规范</span></div>
-      </div>
-    </div>
-
-    <div class="prob">
-      <div class="no">七</div>
-      <div>
-        <h3>畏难焦虑，学科时间分配不合理</h3>
-        <p>高三学科任务繁重，部分学生挤压物理的练习时间，做题手感生疏；多次成绩下滑后产生畏难情绪，害怕物理，不敢主动提问，学习投入不足。</p>
-        <div class="tags"><span class="tag">练习时间被挤压</span><span class="tag">手感生疏</span><span class="tag">不敢提问</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ 第 3 页 改进建议 ============ -->
-  <section class="page" id="actions">
-    <div class="page-title">后续教学改进建议</div>
-    <p class="page-lead">五条建议，逐条对应前面的共性问题，标注为教学落点</p>
-
-    <div class="card">
-      <div class="timeline">
-        <div class="step">
-          <h3>强化审题专项训练</h3>
-          <p>要求做题圈画题干关键条件，养成先分析情景、再动笔计算的习惯。</p>
-          <span class="aim">主要对应问题一</span>
-        </div>
-        <div class="step">
-          <h3>常态化限时训练</h3>
-          <p>训练答题节奏，教会学生考场取舍，坚持先易后难，预留检查时间。</p>
-          <span class="aim">主要对应问题二</span>
-        </div>
-        <div class="step">
-          <h3>关注学生心理状态</h3>
-          <p>做好考前心态疏导，引导学生正确看待单次考试的得失。</p>
-          <span class="aim">主要对应问题三、问题七</span>
-        </div>
-        <div class="step">
-          <h3>紧抓课堂效率，落实错题本复盘</h3>
-          <p>鼓励主动提问，把课堂知识转化为独立解题能力。</p>
-          <span class="aim">主要对应问题四、问题五、问题七</span>
-        </div>
-        <div class="step">
-          <h3>规范答题书写训练</h3>
-          <p>强调物理列式、代入计算的规范，减少无谓的低级失分。</p>
-          <span class="aim">主要对应问题六</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ 第 4 页 对照表 ============ -->
-  <section class="page" id="mapping">
-    <div class="page-title">问题与对策对照</div>
-    <p class="page-lead">把七类问题映射到五条建议，便于课堂上逐项落实</p>
-
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th style="width:22%">共性问题</th>
-            <th style="width:26%">核心表现</th>
-            <th style="width:22%">对应建议</th>
-            <th style="width:30%">课堂落实抓手</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="pid">一 审题粗心</td>
-            <td>漏看条件、看错物理量</td>
-            <td class="sid">建议 1</td>
-            <td>限时圈画关键词训练，先分析情景再动笔</td>
-          </tr>
-          <tr>
-            <td class="pid">二 时间分配失衡</td>
-            <td>死磕难题、后题来不及</td>
-            <td class="sid">建议 2</td>
-            <td>整卷限时练，先易后难，预留 8 至 10 分钟检查</td>
-          </tr>
-          <tr>
-            <td class="pid">三 应试心态不稳</td>
-            <td>遇陌生题慌乱、连环出错</td>
-            <td class="sid">建议 3</td>
-            <td>考前心理疏导，讲清单次考试的诊断功能</td>
-          </tr>
-          <tr>
-            <td class="pid">四 听课效率低</td>
-            <td>听得懂不会做、缺复盘</td>
-            <td class="sid">建议 4</td>
-            <td>当堂独立推演，课后当天复述要点</td>
-          </tr>
-          <tr>
-            <td class="pid">五 刷题重数量</td>
-            <td>直接看答案、同类题反复错</td>
-            <td class="sid">建议 4</td>
-            <td>错题本按题型归档，二次重做过关制</td>
-          </tr>
-          <tr>
-            <td class="pid">六 计算与书写</td>
-            <td>代入出错、步骤不规范</td>
-            <td class="sid">建议 5</td>
-            <td>规范列式模板，草稿分区，分步给分训练</td>
-          </tr>
-          <tr>
-            <td class="pid">七 畏难与时间挤占</td>
-            <td>手感生疏、不敢提问</td>
-            <td class="sid">建议 3 + 4</td>
-            <td>固定每日物理练习时段，设立提问与面批时间</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="note">说明：问题与建议的原文均来自学生反思材料整理，表格中的“对应建议”与“课堂落实抓手”为在此基础上的归纳与细化，供教学安排参考，可按班级实际情况调整。</div>
-  </section>
-
-</main>
-
-<footer>
-  近期学生物理考试反思总结　·　2026年10月整理
-</footer>
-
-<script>
-  (function () {
-    var links = document.querySelectorAll('.nav-inner a');
-    var pages = document.querySelectorAll('section.page');
-
-    function show(name) {
-      pages.forEach(function (p) {
-        p.classList.toggle('active', p.id === name);
-      });
-      links.forEach(function (a) {
-        a.classList.toggle('active', a.getAttribute('data-page') === name);
-      });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    var valid = ['overview', 'problems', 'actions', 'mapping'];
-
-    function fromHash() {
-      var h = (location.hash || '').replace('#', '');
-      if (valid.indexOf(h) === -1) { h = 'overview'; }
-      show(h);
-    }
-
-    links.forEach(function (a) {
-      a.addEventListener('click', function (e) {
-        e.preventDefault();
-        var t = a.getAttribute('data-page');
-        if (location.hash === '#' + t) { show(t); } else { location.hash = t; }
-      });
-    });
-
-    window.addEventListener('hashchange', fromHash);
-    fromHash();
-  })();
-</script>
+<div class="warn">
+<b>易错点提醒：</b>
+<ul>
+  <li>机车<b>不能同时</b>做到"功率已经是额定功率"又"加速度还保持原来那么大"。功率到顶后，速度再想增大，只能以牺牲加速度为代价。</li>
+  <li>$v_1 = \dfrac{P_{\text{额}}}{f + m a_0}$ 是<b>匀加速阶段结束的速度</b>，不是最大速度；最大速度是 $v_m = \dfrac{P_{\text{额}}}{f}$，且 $v_1 < v_m$。</li>
+  <li>当题目说"机车以恒定功率启动"，就走模型一；说"机车以恒定加速度启动"，就走模型二。</li>
+</ul>
+</div>
 
 </body>
 </html>
