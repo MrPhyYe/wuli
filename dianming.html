@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#eef2f8">
+<title>随机点名</title>
+<style>
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-drag: none;
+  }
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
+    background: #eef2f8;
+    color: #14213d;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: manipulation;
+  }
+  body {
+    display: flex; flex-direction: column;
+    height: 100vh;
+  }
+
+  header {
+    flex: 0 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 34px 62px 0;
+  }
+
+  .tabs { display: flex; gap: 22px; }
+  .tab {
+    min-width: 208px; height: 82px; padding: 0 34px;
+    border: 0; border-radius: 16px;
+    background: #ffffff; color: #6b7688;
+    font-size: 27px; font-weight: 700; font-family: inherit;
+    letter-spacing: 0.06em; cursor: pointer;
+    box-shadow: 0 3px 10px rgba(20, 33, 61, 0.07);
+    transition: background .12s, color .12s, transform .08s;
+  }
+  .tab.active { background: #1e5799; color: #fff; box-shadow: 0 8px 20px rgba(30, 87, 153, 0.26); }
+  .tab:active { transform: scale(0.96); }
+
+  .meta { display: flex; align-items: center; gap: 30px; }
+  #count { font-size: 24px; color: #7a8598; font-variant-numeric: tabular-nums; }
+  #fs {
+    width: 148px; height: 66px; border: 0; border-radius: 14px;
+    background: #ffffff; color: #6b7688;
+    font-size: 22px; font-weight: 600; font-family: inherit;
+    letter-spacing: 0.1em; cursor: pointer;
+    box-shadow: 0 3px 10px rgba(20, 33, 61, 0.07);
+    transition: transform .08s;
+  }
+  #fs:active { transform: scale(0.95); }
+
+  main {
+    flex: 1 1 auto; min-height: 0;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 60px;
+  }
+  #name {
+    font-size: min(235px, 11vw);
+    font-weight: 700;
+    line-height: 1.12;
+    letter-spacing: 0.04em;
+    text-align: center;
+    white-space: nowrap;
+    color: #14213d;
+    will-change: font-size;
+  }
+  #name.spinning { color: #93a3ba; }
+  #name.hit { color: #B05923; animation: pop .38s cubic-bezier(.2, .9, .3, 1.15); }
+  @keyframes pop {
+    0% { transform: scale(0.9); }
+    60% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+
+  footer {
+    flex: 0 0 auto;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 18px; padding: 0 60px 46px;
+  }
+  #draw {
+    width: min(600px, 52vw); height: 122px;
+    border: 0; border-radius: 22px;
+    background: #1e5799; color: #fff;
+    font-size: 36px; font-weight: 700; font-family: inherit;
+    letter-spacing: 0.2em; text-indent: 0.2em;
+    cursor: pointer;
+    box-shadow: 0 12px 30px rgba(30, 87, 153, 0.32);
+    transition: background .12s, transform .08s, box-shadow .12s;
+  }
+  #draw:active { transform: scale(0.975); background: #17497f; }
+  #draw:disabled { background: #a9b6c8; box-shadow: none; }
+
+  .hint { font-size: 19px; color: #77839a; letter-spacing: 0.04em; }
+
+  @media (max-width: 1100px) {
+    header { padding: 22px 30px 0; }
+    .tabs { gap: 14px; }
+    .tab { min-width: 150px; height: 64px; padding: 0 24px; font-size: 21px; }
+    #count { font-size: 18px; }
+    #fs { width: 112px; height: 54px; font-size: 17px; }
+    main { padding: 0 30px; }
+    #draw { height: 96px; font-size: 28px; }
+    .hint { font-size: 15px; }
+    footer { padding-bottom: 26px; }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div class="tabs">
+      <button class="tab active" data-class="310">310 班</button>
+      <button class="tab" data-class="315">315 班</button>
+    </div>
+    <div class="meta">
+      <span id="count">本次已抽 0 次</span>
+      <button id="fs">全屏</button>
+    </div>
+  </header>
+
+  <main>
+    <div id="name">准备</div>
+  </main>
+
+  <footer>
+    <button id="draw">抽 一 个</button>
+    <div class="hint">用触控笔点一下按钮，可以连续抽</div>
+  </footer>
+
+<script>
+const CLASSES = {
+  "310": ["李霆杰","桂阳","李定旺","开金源","李轩","杨瑞","程子翔","张子怡","蔡朝吉","笪梦齐",
+          "江政","雷浩天","齐冰生","毛星辰","姚许芯","钱卓阳","李昇","王子航","都汝洁","李欣怡",
+          "汪鑫仪","朱睿婕","黄凯","王佩佩","程茁","郎震晨","张驰","秦朗","崔景琦","李梦园",
+          "陈佳乐（10）","汪仁杰","汪嘉琦","詹涵","汪馨怡","官子瑞","丰硕","陈雅菲","徐静婷",
+          "张鹤龄","姜昕怡","吴喆","王茹晗","吴先康","彭森涛","徐馨月","江芷如","汪旭","尹佳乐"],
+  "315": ["李成奇","徐一凡","张芮","江博","汪家兴","詹宇辰","方晴雨","石印","程舒涵","叶振皓",
+          "张思琪","倪迎庆","丁思曼","汪心浩","王恩赐","汪咏康","吴优安","殷娅楠","彭征航","周浩",
+          "李燕琪","吴自扬","向苗发","朱三省","姚知宇","王亚东","汪嘉颖","胡泽萱","汪祈新","方睿",
+          "胡博","施佳豪","齐夏琳","李佳怡","黄茁","王子祺","吴梓轩","吕昭阳","汤兴宇",
+          "齐可欣","张开心","黄佳欣","徐思彤","彭晨晨","胡杨","江涵（15）","倪露","陈思宇","李蕾"]
+};
+
+const WEIGHTS = [10, 20, 40, 30, 10];
+
+function buildPool(list) {
+  const n = list.length;
+  const bounds = [[0, 10], [10, 20], [20, 30], [30, n - 10], [n - 10, n]];
+  const cum = [];
+  let acc = 0;
+  bounds.forEach(function (b, i) {
+    const s = Math.max(0, b[0]);
+    const e = Math.min(n, b[1]);
+    const count = e - s;
+    if (count <= 0) return;
+    const per = WEIGHTS[i] / count;
+    for (let k = s; k < e; k++) {
+      acc += per;
+      cum.push({ i: k, w: acc });
+    }
+  });
+  return { cum: cum, total: acc };
+}
+
+const POOLS = {};
+Object.keys(CLASSES).forEach(function (k) {
+  POOLS[k] = buildPool(CLASSES[k]);
+});
+
+function pick(pool) {
+  const r = Math.random() * pool.total;
+  let lo = 0, hi = pool.cum.length - 1;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (pool.cum[mid].w < r) lo = mid + 1; else hi = mid;
+  }
+  return pool.cum[lo].i;
+}
+
+let current = "310";
+let spinning = false;
+let count = 0;
+
+const nameEl = document.getElementById("name");
+const drawBtn = document.getElementById("draw");
+const countEl = document.getElementById("count");
+
+function finalSize(txt) {
+  const n = txt.length;
+  if (n <= 2) return "min(470px, 25vw)";
+  if (n === 3) return "min(430px, 21.5vw)";
+  if (n === 4) return "min(360px, 17.5vw)";
+  return "min(235px, 11vw)";
+}
+
+function switchClass(code) {
+  if (spinning || code === current) return;
+  current = code;
+  document.querySelectorAll(".tab").forEach(function (b) {
+    b.classList.toggle("active", b.dataset.class === code);
+  });
+  nameEl.textContent = "准备";
+  nameEl.style.fontSize = finalSize("准备");
+  nameEl.classList.remove("hit", "spinning");
+  count = 0;
+  countEl.textContent = "本次已抽 0 次";
+}
+
+function draw() {
+  if (spinning) return;
+  spinning = true;
+  drawBtn.disabled = true;
+  nameEl.classList.remove("hit");
+  nameEl.classList.add("spinning");
+  nameEl.style.fontSize = "";
+
+  const list = CLASSES[current];
+  const pool = POOLS[current];
+  const finalIdx = pick(pool);
+
+  let step = 0;
+  const fast = 13;
+  const total = 19;
+
+  function tick() {
+    step++;
+    if (step >= total) {
+      nameEl.textContent = list[finalIdx];
+      nameEl.style.fontSize = finalSize(list[finalIdx]);
+      nameEl.classList.remove("spinning");
+      nameEl.classList.add("hit");
+      count++;
+      countEl.textContent = "本次已抽 " + count + " 次";
+      spinning = false;
+      drawBtn.disabled = false;
+      return;
+    }
+    nameEl.textContent = list[Math.floor(Math.random() * list.length)];
+    let delay;
+    if (step < fast) {
+      delay = 55;
+    } else {
+      delay = 55 + Math.pow(step - fast + 1, 2) * 16;
+    }
+    setTimeout(tick, delay);
+  }
+  tick();
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(function () {});
+    }
+  } else if (document.exitFullscreen) {
+    document.exitFullscreen().catch(function () {});
+  }
+}
+
+document.querySelectorAll(".tab").forEach(function (btn) {
+  btn.addEventListener("click", function () {
+    switchClass(btn.dataset.class);
+  });
+});
+
+drawBtn.addEventListener("click", draw);
+document.getElementById("fs").addEventListener("click", toggleFullscreen);
+
+document.addEventListener("keydown", function (e) {
+  if (e.code === "Space" || e.code === "Enter") {
+    e.preventDefault();
+    draw();
+  } else if (e.key === "1") {
+    switchClass("310");
+  } else if (e.key === "2") {
+    switchClass("315");
+  } else if (e.key === "f" || e.key === "F") {
+    toggleFullscreen();
+  }
+});
+
+nameEl.style.fontSize = finalSize("准备");
+</script>
+</body>
+</html>
