@@ -58,6 +58,17 @@
   }
   #fs:active { transform: scale(0.95); }
 
+  #reset {
+    width: 126px; height: 66px; border: 0; border-radius: 14px;
+    background: #ffffff; color: #8b95a6;
+    font-size: 21px; font-weight: 600; font-family: inherit;
+    letter-spacing: 0.06em; cursor: pointer;
+    box-shadow: 0 3px 10px rgba(20, 33, 61, 0.07);
+    transition: transform .08s, background .15s, color .15s;
+  }
+  #reset:active { transform: scale(0.95); }
+  #reset.arming { background: #c8372d; color: #fff; }
+
   main {
     flex: 1 1 auto; min-height: 0;
     display: flex; align-items: center; justify-content: center;
@@ -107,6 +118,7 @@
     .tab { min-width: 150px; height: 64px; padding: 0 24px; font-size: 21px; }
     #count { font-size: 18px; }
     #fs { width: 112px; height: 54px; font-size: 17px; }
+    #reset { width: 96px; height: 54px; font-size: 16px; }
     main { padding: 0 30px; }
     #draw { height: 96px; font-size: 28px; }
     .hint { font-size: 15px; }
@@ -121,7 +133,8 @@
       <button class="tab" data-class="315">315 班</button>
     </div>
     <div class="meta">
-      <span id="count">本次已抽 0 次</span>
+      <span id="count">已抽 0 / 49</span>
+      <button id="reset">重置</button>
       <button id="fs">全屏</button>
     </div>
   </header>
@@ -132,7 +145,7 @@
 
   <footer>
     <button id="draw">抽 一 个</button>
-    <div class="hint">用触控笔点一下按钮，可以连续抽</div>
+    <div class="hint">本轮抽过的人不再重复，全班抽完可重新开始</div>
   </footer>
 
 <script>
@@ -151,7 +164,40 @@ const CLASSES = {
 
 const WEIGHTS = [10, 20, 40, 30, 10];
 
-function buildPool(list) {
+const STORE_PREFIX = "dianming_round_";
+const DRAWN = {};
+
+function todayStr() {
+  const d = new Date();
+  const p = function (n) { return n < 10 ? "0" + n : "" + n; };
+  return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
+}
+
+function storeKey(cls) {
+  return STORE_PREFIX + todayStr() + "_" + cls;
+}
+
+function loadDrawn(cls) {
+  const set = new Set();
+  try {
+    const raw = localStorage.getItem(storeKey(cls));
+    if (raw) {
+      const n = CLASSES[cls].length;
+      JSON.parse(raw).forEach(function (i) {
+        if (typeof i === "number" && i >= 0 && i < n) set.add(i);
+      });
+    }
+  } catch (e) {}
+  return set;
+}
+
+function saveDrawn(cls) {
+  try {
+    localStorage.setItem(storeKey(cls), JSON.stringify(Array.from(DRAWN[cls])));
+  } catch (e) {}
+}
+
+function buildPool(list, drawn) {
   const n = list.length;
   const bounds = [[0, 10], [10, 20], [20, 30], [30, n - 10], [n - 10, n]];
   const cum = [];
@@ -159,20 +205,22 @@ function buildPool(list) {
   bounds.forEach(function (b, i) {
     const s = Math.max(0, b[0]);
     const e = Math.min(n, b[1]);
-    const count = e - s;
-    if (count <= 0) return;
-    const per = WEIGHTS[i] / count;
+    const avail = [];
     for (let k = s; k < e; k++) {
+      if (!drawn.has(k)) avail.push(k);
+    }
+    if (!avail.length) return;
+    const per = WEIGHTS[i] / avail.length;
+    for (let j = 0; j < avail.length; j++) {
       acc += per;
-      cum.push({ i: k, w: acc });
+      cum.push({ i: avail[j], w: acc });
     }
   });
   return { cum: cum, total: acc };
 }
 
-const POOLS = {};
 Object.keys(CLASSES).forEach(function (k) {
-  POOLS[k] = buildPool(CLASSES[k]);
+  DRAWN[k] = loadDrawn(k);
 });
 
 function pick(pool) {
@@ -187,11 +235,11 @@ function pick(pool) {
 
 let current = "310";
 let spinning = false;
-let count = 0;
 
 const nameEl = document.getElementById("name");
 const drawBtn = document.getElementById("draw");
 const countEl = document.getElementById("count");
+const resetBtn = document.getElementById("reset");
 
 function finalSize(txt) {
   const n = txt.length;
@@ -201,30 +249,59 @@ function finalSize(txt) {
   return "min(235px, 11vw)";
 }
 
+function totalOf(cls) { return CLASSES[cls].length; }
+function isDone() { return DRAWN[current].size >= totalOf(current); }
+
+function updateStatus() {
+  countEl.textContent = "已抽 " + DRAWN[current].size + " / " + totalOf(current);
+}
+
+function syncButton() {
+  drawBtn.textContent = isDone() ? "重新开始" : "抽 一 个";
+}
+
+function idleFace(text) {
+  nameEl.textContent = text;
+  nameEl.style.fontSize = finalSize(text);
+  nameEl.classList.remove("hit", "spinning");
+}
+
+function resetRound() {
+  if (spinning) return;
+  DRAWN[current] = new Set();
+  saveDrawn(current);
+  updateStatus();
+  syncButton();
+  idleFace("准备");
+}
+
 function switchClass(code) {
   if (spinning || code === current) return;
   current = code;
   document.querySelectorAll(".tab").forEach(function (b) {
     b.classList.toggle("active", b.dataset.class === code);
   });
-  nameEl.textContent = "准备";
-  nameEl.style.fontSize = finalSize("准备");
-  nameEl.classList.remove("hit", "spinning");
-  count = 0;
-  countEl.textContent = "本次已抽 0 次";
+  idleFace(isDone() ? "已抽完" : "准备");
+  updateStatus();
+  syncButton();
 }
 
 function draw() {
   if (spinning) return;
+  const list = CLASSES[current];
+  const drawn = DRAWN[current];
+  if (drawn.size >= list.length) return;
+
+  const pool = buildPool(list, drawn);
+  if (!pool.cum.length) return;
+  const finalIdx = pick(pool);
+  const poolIdx = pool.cum.map(function (c) { return c.i; });
+
   spinning = true;
   drawBtn.disabled = true;
   nameEl.classList.remove("hit");
   nameEl.classList.add("spinning");
   nameEl.style.fontSize = "";
-
-  const list = CLASSES[current];
-  const pool = POOLS[current];
-  const finalIdx = pick(pool);
 
   let step = 0;
   const fast = 13;
@@ -237,13 +314,15 @@ function draw() {
       nameEl.style.fontSize = finalSize(list[finalIdx]);
       nameEl.classList.remove("spinning");
       nameEl.classList.add("hit");
-      count++;
-      countEl.textContent = "本次已抽 " + count + " 次";
+      drawn.add(finalIdx);
+      saveDrawn(current);
+      updateStatus();
       spinning = false;
       drawBtn.disabled = false;
+      syncButton();
       return;
     }
-    nameEl.textContent = list[Math.floor(Math.random() * list.length)];
+    nameEl.textContent = list[poolIdx[Math.floor(Math.random() * poolIdx.length)]];
     let delay;
     if (step < fast) {
       delay = 55;
@@ -271,13 +350,38 @@ document.querySelectorAll(".tab").forEach(function (btn) {
   });
 });
 
-drawBtn.addEventListener("click", draw);
+drawBtn.addEventListener("click", function () {
+  if (isDone()) { resetRound(); return; }
+  draw();
+});
 document.getElementById("fs").addEventListener("click", toggleFullscreen);
+
+let armTimer = null;
+let armed = false;
+resetBtn.addEventListener("click", function () {
+  if (spinning) return;
+  if (!armed) {
+    armed = true;
+    resetBtn.textContent = "确认重置";
+    resetBtn.classList.add("arming");
+    armTimer = setTimeout(function () {
+      armed = false;
+      resetBtn.textContent = "重置";
+      resetBtn.classList.remove("arming");
+    }, 3000);
+    return;
+  }
+  clearTimeout(armTimer);
+  armed = false;
+  resetBtn.textContent = "重置";
+  resetBtn.classList.remove("arming");
+  resetRound();
+});
 
 document.addEventListener("keydown", function (e) {
   if (e.code === "Space" || e.code === "Enter") {
     e.preventDefault();
-    draw();
+    if (isDone()) { resetRound(); } else { draw(); }
   } else if (e.key === "1") {
     switchClass("310");
   } else if (e.key === "2") {
@@ -287,7 +391,9 @@ document.addEventListener("keydown", function (e) {
   }
 });
 
-nameEl.style.fontSize = finalSize("准备");
+updateStatus();
+syncButton();
+idleFace(isDone() ? "已抽完" : "准备");
 </script>
 </body>
 </html>
